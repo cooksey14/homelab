@@ -272,11 +272,42 @@ EOF
         --set server.persistentVolume.enabled=true \
         --set server.persistentVolume.existingClaim=prometheus-usb-pvc \
         --set server.nodeSelector."kubernetes\.io/hostname"=pi \
+        --set server.service.type=ClusterIP \
         --wait
     
     wait_for_pods "monitoring"
     
-    print_success "Prometheus installed"
+    # Create Prometheus ingress
+    cat <<EOF | kubectl apply -f -
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: prometheus
+  namespace: monitoring
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: prometheus.$DOMAIN
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - prometheus.$DOMAIN
+    secretName: prometheus-tls
+EOF
+    
+    print_success "Prometheus installed with HTTPS ingress"
 }
 
 # Function to install Grafana
@@ -299,8 +330,7 @@ EOF
         --namespace monitoring \
         --set admin.user=admin \
         --set admin.password=admin \
-        --set service.type=NodePort \
-        --set service.nodePort=30180 \
+        --set service.type=ClusterIP \
         --set database.type=postgresql \
         --set database.host=postgres-postgresql.monitoring.svc.cluster.local \
         --set database.port=5432 \
@@ -312,7 +342,37 @@ EOF
     
     wait_for_pods "monitoring"
     
-    print_success "Grafana installed"
+    # Create Grafana ingress
+    cat <<EOF | kubectl apply -f -
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana
+  namespace: monitoring
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: grafana.$DOMAIN
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: grafana
+            port:
+              number: 3000
+  tls:
+  - hosts:
+    - grafana.$DOMAIN
+    secretName: grafana-tls
+EOF
+    
+    print_success "Grafana installed with HTTPS ingress"
 }
 
 # Function to install ArgoCD
@@ -480,7 +540,8 @@ display_cluster_info() {
     echo
     print_status "Access URLs:"
     echo "  ArgoCD: https://argocd.$DOMAIN"
-    echo "  Grafana: http://$MASTER_IP:30180 (admin/admin)"
+    echo "  Grafana: https://grafana.$DOMAIN (admin/admin)"
+    echo "  Prometheus: https://prometheus.$DOMAIN"
     echo "  Mealie: https://mealie.$DOMAIN"
     echo "  Pi-hole: https://pihole.$DOMAIN"
 }
