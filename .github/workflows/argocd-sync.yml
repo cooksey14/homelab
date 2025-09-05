@@ -1,0 +1,100 @@
+name: ArgoCD Sync
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'k3s/**/*.yaml'
+      - 'k3s/**/*.yml'
+  schedule:
+    # Sync every hour to ensure cluster stays in sync
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  argocd-sync:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+
+    - name: Configure kubectl for K3s
+      run: |
+        echo "🔧 Configuring kubectl for K3s cluster..."
+        
+        # Create kubeconfig
+        mkdir -p ~/.kube
+        
+        # Set up SSH key for cluster access
+        echo "${{ secrets.K3S_SSH_PRIVATE_KEY }}" > ~/.ssh/k3s_key
+        chmod 600 ~/.ssh/k3s_key
+        
+        # Configure SSH
+        cat >> ~/.ssh/config << EOF
+        Host k3s-master
+          HostName ${{ secrets.K3S_MASTER_IP }}
+          User ${{ secrets.K3S_SSH_USER }}
+          IdentityFile ~/.ssh/k3s_key
+          StrictHostKeyChecking no
+        EOF
+
+    - name: Setup ArgoCD CLI
+      run: |
+        echo "📥 Installing ArgoCD CLI..."
+        curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+        sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+        rm argocd-linux-amd64
+
+    - name: Login to ArgoCD
+      run: |
+        echo "🔐 Logging into ArgoCD..."
+        
+        # Copy kubeconfig from master node
+        scp -i ~/.ssh/k3s_key ${{ secrets.K3S_SSH_USER }}@${{ secrets.K3S_MASTER_IP }}:~/.kube/config ~/.kube/config
+        
+        # Get ArgoCD server info
+        ARGOCD_SERVER=$(kubectl get svc argocd-server -n argocd -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        ARGOCD_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+        
+        # Login to ArgoCD
+        argocd login $ARGOCD_SERVER --username admin --password $ARGOCD_PASSWORD --insecure
+
+    - name: Sync ArgoCD Applications
+      run: |
+        echo "🔄 Syncing ArgoCD Applications..."
+        
+        # Apply ArgoCD Applications
+        kubectl apply -f k3s/argocd-applications/
+        
+        # Wait for applications to be created
+        sleep 10
+        
+        # Sync applications
+        argocd app sync namespaces --force || echo "⚠️ Namespaces sync failed"
+        argocd app sync monitoring --force || echo "⚠️ Monitoring sync failed"
+        argocd app sync mealie --force || echo "⚠️ Mealie sync failed"
+        
+        # Wait for sync to complete
+        sleep 30
+        
+        # Check application status
+        echo "📊 ArgoCD Application Status:"
+        argocd app list
+
+    - name: Generate sync report
+      run: |
+        echo "📊 ArgoCD Sync Report" >> $GITHUB_STEP_SUMMARY
+        echo "====================" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "🔄 Sync Type: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "📅 Date: $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "🔗 Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📊 Application Status:" >> $GITHUB_STEP_SUMMARY
+        argocd app list >> $GITHUB_STEP_SUMMARY || echo "Failed to get app status" >> $GITHUB_STEP_SUMMARY

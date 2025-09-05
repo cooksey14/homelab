@@ -1,0 +1,126 @@
+# Default values for grafana.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: bitnami/grafana
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+grafana:
+  # Admin credentials for Grafana
+  admin:
+    user: admin
+    password: admin
+  paths:
+    config: /opt/bitnami/grafana/conf/grafana.ini
+    data: /opt/bitnami/grafana/data
+    logs: /opt/bitnami/grafana/logs
+    plugins: /opt/bitnami/grafana/data/plugins
+    provisioning: /opt/bitnami/grafana/conf/provisioning
+
+  # Persistence configuration
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+
+  # Database configuration
+  database:
+    type: postgresql
+    host: postgres-postgresql.monitoring.svc.cluster.local
+    port: 5432
+    user: grafana
+    name: grafana
+    password:
+      secretName: grafana-db-secret
+      key: password
+
+service:
+  type: NodePort
+  nodePort: 30180  # Optional: specify the desired NodePort, or leave this out for Kubernetes to assign one
+  port: 3000
+  targetPort: 3000
+
+
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 250m
+  limits:
+    memory: 512Mi
+    cpu: 500m
+
+nodeSelector: {}
+tolerations: []
+
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - pi
+
+
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - host: grafana.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+livenessProbe:
+  httpGet:
+    path: /api/health
+    port: http
+  initialDelaySeconds: 60
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /api/health
+    port: http
+  initialDelaySeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+  periodSeconds: 10
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+securityContext:
+  enabled: true
+  fsGroup: 1001
+  runAsUser: 1001
+
+extraEnvVars: []
+  # Example:
+  # - name: GF_AUTH_ANONYMOUS_ENABLED
+  #   value: "true"
+
+extraVolumeMounts: []
+extraVolumes: []
+extraFlags: []
+

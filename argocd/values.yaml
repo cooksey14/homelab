@@ -1,0 +1,16 @@
+server:
+  ingress:
+    enabled: true
+    hosts:
+      - argo.local
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    tls:
+      - hosts:
+          - argo.local
+        secretName: argocd-tls
+  extraArgs:
+    - --basehref=/ # Corrects the serving path
+    - --insecure # Optional: Skip HTTPS if SSL termination is handled externally
+

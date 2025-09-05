@@ -1,0 +1,67 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run security scan daily
+    - cron: '0 2 * * *'
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+    - name: Check for secrets in YAML files
+      run: |
+        echo "🔍 Scanning for potential secrets..."
+        
+        # Check for common secret patterns
+        if grep -r -E "(password|secret|key|token).*:.*[A-Za-z0-9]{8,}" k3s/ --include="*.yaml" --include="*.yml"; then
+          echo "⚠️ Potential secrets found in YAML files"
+          echo "Please ensure all secrets are properly managed through Kubernetes secrets"
+        else
+          echo "✅ No obvious secrets found in YAML files"
+        fi
+
+    - name: Validate RBAC permissions
+      run: |
+        echo "🔍 Validating RBAC configurations..."
+        
+        # Check for overly permissive RBAC
+        if find k3s -name "*.yaml" -o -name "*.yml" | xargs grep -l "kind: ClusterRole\|kind: Role" | xargs grep -l "\*.*\*"; then
+          echo "⚠️ Found potentially overly permissive RBAC rules"
+        else
+          echo "✅ RBAC configurations look reasonable"
+        fi
+
+    - name: Generate security report
+      run: |
+        echo "📊 Security Scan Report" >> $GITHUB_STEP_SUMMARY
+        echo "======================" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "🔍 Scan Date: $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "🔗 Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Vulnerability Scan: Completed" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Secret Detection: Completed" >> $GITHUB_STEP_SUMMARY
+        echo "✅ RBAC Validation: Completed" >> $GITHUB_STEP_SUMMARY

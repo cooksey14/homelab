@@ -1,0 +1,102 @@
+name: Deploy to K3s Cluster
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'k3s/**/*.yaml'
+      - 'k3s/**/*.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+
+    - name: Configure kubectl for K3s
+      run: |
+        echo "🔧 Configuring kubectl for K3s cluster..."
+        
+        # Create kubeconfig
+        mkdir -p ~/.kube
+        
+        # Set up SSH key for cluster access
+        echo "${{ secrets.K3S_SSH_PRIVATE_KEY }}" > ~/.ssh/k3s_key
+        chmod 600 ~/.ssh/k3s_key
+        
+        # Configure SSH
+        cat >> ~/.ssh/config << EOF
+        Host k3s-master
+          HostName ${{ secrets.K3S_MASTER_IP }}
+          User ${{ secrets.K3S_SSH_USER }}
+          IdentityFile ~/.ssh/k3s_key
+          StrictHostKeyChecking no
+        EOF
+
+    - name: Deploy to cluster
+      run: |
+        echo "🚀 Deploying to K3s cluster..."
+        
+        # Copy kubeconfig from master node
+        scp -i ~/.ssh/k3s_key ${{ secrets.K3S_SSH_USER }}@${{ secrets.K3S_MASTER_IP }}:~/.kube/config ~/.kube/config
+        
+        # Apply configurations in order
+        echo "📁 Applying namespaces..."
+        kubectl apply -f k3s/namespaces/ || echo "⚠️ Some namespaces may already exist"
+        
+        echo "🔐 Applying secrets..."
+        kubectl apply -f k3s/secrets/
+        
+        echo "📊 Applying monitoring stack..."
+        kubectl apply -f k3s/applications/monitoring/prometheus/
+        
+        echo "🍽️ Applying Mealie..."
+        kubectl apply -f k3s/applications/mealie/
+        
+        echo "🔒 Applying cert-manager configurations..."
+        kubectl apply -f k3s/certmanager/
+        
+        echo "🌐 Applying MetalLB configuration..."
+        kubectl apply -f k3s/metalLB/metallb-config.yaml
+
+    - name: Verify deployment
+      run: |
+        echo "🔍 Verifying deployment..."
+        
+        # Wait for pods to be ready
+        kubectl wait --for=condition=ready pod -l app=prometheus -n monitoring --timeout=300s || echo "⚠️ Prometheus not ready"
+        kubectl wait --for=condition=ready pod -l app=mealie -n mealie --timeout=300s || echo "⚠️ Mealie not ready"
+        
+        # Show pod status
+        echo "📊 Pod Status:"
+        kubectl get pods -A | grep -E "(prometheus|mealie|grafana|postgres)"
+
+    - name: Generate deployment report
+      run: |
+        echo "📊 Deployment Report" >> $GITHUB_STEP_SUMMARY
+        echo "===================" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "🚀 Deployment: ${{ github.event.inputs.environment || 'production' }}" >> $GITHUB_STEP_SUMMARY
+        echo "📅 Date: $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "🔗 Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📊 Cluster Status:" >> $GITHUB_STEP_SUMMARY
+        kubectl get pods -A | grep -E "(prometheus|mealie|grafana|postgres)" >> $GITHUB_STEP_SUMMARY || echo "No pods found" >> $GITHUB_STEP_SUMMARY

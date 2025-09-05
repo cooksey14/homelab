@@ -1,0 +1,27 @@
+version: 2
+updates:
+  # Update GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "colin-cook"
+    assignees:
+      - "colin-cook"
+
+  # Update Docker images in YAML files
+  - package-ecosystem: "docker"
+    directory: "/k3s"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "colin-cook"
+    assignees:
+      - "colin-cook"

@@ -1,0 +1,23 @@
+# PostgreSQL Helm values
+imagePullSecrets:
+- name: regcred
+
+# Enable persistence
+primary:
+  persistence:
+    enabled: true
+    size: 8Gi
+    storageClass: local-path
+
+# Set up database for Grafana
+auth:
+  postgresPassword: "YGE0nSle03"
+  database: "grafana"
+  username: "grafana"
+  password: "YGE0nSle03"
+
+# Service configuration
+service:
+  type: ClusterIP
+  ports:
+    postgres: 5432

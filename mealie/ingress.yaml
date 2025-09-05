@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mealie
+  namespace: mealie
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    # Optional redirect middleware if you want HTTP → HTTPS redirection
+    # traefik.ingress.kubernetes.io/router.middlewares: redirect-to-https@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: mealie.cooklabs.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mealie
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - mealie.cooklabs.net
+    secretName: mealie-tls
+
