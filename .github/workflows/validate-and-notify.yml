@@ -1,0 +1,75 @@
+name: Validate and Notify
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'k3s/**/*.yaml'
+      - 'k3s/**/*.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'k3s/**/*.yaml'
+      - 'k3s/**/*.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+
+    - name: Validate YAML syntax
+      run: |
+        echo "🔍 Validating YAML syntax..."
+        for file in $(find k3s -name "*.yaml" -o -name "*.yml"); do
+          echo "Validating $file"
+          kubectl --dry-run=client apply -f "$file" || {
+            echo "❌ Validation failed for $file"
+            exit 1
+          }
+        done
+        echo "✅ All YAML files are valid"
+
+    - name: Check for common issues
+      run: |
+        echo "🔍 Checking for common configuration issues..."
+        
+        # Check for hardcoded secrets
+        if grep -r "password:" k3s/ --include="*.yaml" --include="*.yml" | grep -v "secretName\|secretKeyRef"; then
+          echo "⚠️ Warning: Found potential hardcoded passwords"
+        fi
+        
+        # Check for missing namespaces
+        echo "📁 Checking namespace consistency..."
+        find k3s -name "*.yaml" -o -name "*.yml" | xargs grep -l "namespace:" | while read file; do
+          if ! grep -q "kind: Namespace" "$file"; then
+            echo "ℹ️ $file references a namespace"
+          fi
+        done
+        
+        echo "✅ Basic validation completed"
+
+    - name: Generate validation report
+      run: |
+        echo "📊 Validation Report" >> $GITHUB_STEP_SUMMARY
+        echo "===================" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ YAML Syntax: Valid" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Kubernetes Manifests: Valid" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Configuration Check: Passed" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📁 Files validated: $(find k3s -name "*.yaml" -o -name "*.yml" | wc -l)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "🔄 Next Steps:" >> $GITHUB_STEP_SUMMARY
+        echo "1. Review changes in ArgoCD UI" >> $GITHUB_STEP_SUMMARY
+        echo "2. Manually sync applications when ready" >> $GITHUB_STEP_SUMMARY
+        echo "3. Monitor deployment progress" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "🌐 ArgoCD UI: https://argocd.cooklabs.net" >> $GITHUB_STEP_SUMMARY

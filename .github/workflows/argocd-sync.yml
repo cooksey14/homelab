@@ -1,15 +1,13 @@
-name: ArgoCD Sync
+name: ArgoCD Sync (Legacy - Use Manual Sync Instead)
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'k3s/**/*.yaml'
-      - 'k3s/**/*.yml'
-  schedule:
-    # Sync every hour to ensure cluster stays in sync
-    - cron: '0 * * * *'
   workflow_dispatch:
+    inputs:
+      sync_all:
+        description: 'Sync all applications'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   argocd-sync:
