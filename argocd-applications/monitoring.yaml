@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/your-repo/k3s-config
+    repoURL: https://github.com/cooksey14/homelab.git
     targetRevision: HEAD
     path: k3s/applications/monitoring
   destination:
