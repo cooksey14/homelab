@@ -14,7 +14,7 @@ spec:
         # ArgoCD server configuration
         server:
           service:
-            type: LoadBalancer
+            type: ClusterIP
           ingress:
             enabled: true
             ingressClassName: "traefik"
