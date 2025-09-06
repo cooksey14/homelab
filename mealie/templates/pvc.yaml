@@ -30,7 +30,7 @@ spec:
   capacity:
     storage: {{ .Values.persistence.size }}
   accessModes:
-  - {{ .Values.persistence.accessMode }}delete the pvc
+  - {{ .Values.persistence.accessMode }}
   persistentVolumeReclaimPolicy: {{ .Values.persistence.sharedStorage.reclaimPolicy }}
   storageClassName: {{ .Values.persistence.storageClass }}
   hostPath:
