@@ -89,8 +89,8 @@ podDisruptionBudget:
 
 persistence:
   enabled: true
-  storageClass: ""
-  accessMode: ReadWriteOnce
+  storageClass: "shared-hostpath"
+  accessMode: ReadWriteMany
   size: 2Gi
 
 # Mealie specific configuration
