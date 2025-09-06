@@ -1,0 +1,82 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vaultwarden
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://cooksey14: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@github.com/cooksey14/homelab.git
+    path: vaultwarden
+    targetRevision: HEAD
+    helm:
+      values: |
+        # Override default values for production
+        vaultwarden:
+          env:
+            # Generate a secure admin token
+            ADMIN_TOKEN: "CHANGE_ME_GENERATE_WITH_OPENSSL_RAND_BASE64_48"
+            # Set your domain
+            DOMAIN: "https://vaultwarden.cooklabs.net"
+            # Disable signups in production (enable for initial setup)
+            SIGNUPS_ALLOWED: "true"
+            # Enable invitations
+            INVITATIONS_ALLOWED: "true"
+            # Disable password hints for security
+            SHOW_PASSWORD_HINT: "false"
+            # Increase password iterations for better security
+            PASSWORD_ITERATIONS: "100000"
+            # Enable WebSocket support
+            WEBSOCKET_ENABLED: "true"
+            # Set log level
+            LOG_LEVEL: "warn"
+            # Enable extended logging
+            EXTENDED_LOGGING: "true"
+            # Icon cache settings
+            ICON_CACHE_TTL: "2592000"
+            ICON_CACHE_NEGTTL: "2592000"
+        
+        # Resource limits
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        
+        # Persistence settings
+        persistence:
+          enabled: true
+          size: 2Gi
+          accessMode: ReadWriteOnce
+        
+        # Ingress settings
+        ingress:
+          enabled: true
+          className: "traefik"
+          annotations:
+            cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
+            traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+            traefik.ingress.kubernetes.io/router.tls: "true"
+          hosts:
+            - host: vaultwarden.cooklabs.net
+              paths:
+                - path: /
+                  pathType: Prefix
+          tls:
+            - secretName: vaultwarden-tls
+              hosts:
+                - vaultwarden.cooklabs.net
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: vaultwarden
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
+    syncOptions:
+    - CreateNamespace=true
+    - Prune=true
+    - PrunePropagationPolicy=foreground
+    - PruneLast=true

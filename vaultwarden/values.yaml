@@ -1,0 +1,143 @@
+# Default values for vaultwarden
+# This is a YAML-formatted file.
+
+replicaCount: 1
+
+image:
+  repository: vaultwarden/server
+  pullPolicy: IfNotPresent
+  tag: "1.30.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
+    traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  hosts:
+    - host: vaultwarden.cooklabs.net
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: vaultwarden-tls
+      hosts:
+        - vaultwarden.cooklabs.net
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 1Gi
+
+# Vaultwarden specific configuration
+vaultwarden:
+  # Admin panel settings
+  adminPanel:
+    enabled: true
+  
+  # Database settings
+  database:
+    url: "file:/data/db.sqlite3"
+  
+  # Web vault settings
+  webVault:
+    enabled: true
+  
+  # Environment variables
+  env:
+    # Admin token for admin panel (generate with: openssl rand -base64 48)
+    ADMIN_TOKEN: "CHANGE_ME_GENERATE_WITH_OPENSSL_RAND_BASE64_48"
+    
+    # Domain for the web vault
+    DOMAIN: "https://vaultwarden.cooklabs.net"
+    
+    # Signups allowed (set to false in production)
+    SIGNUPS_ALLOWED: "true"
+    
+    # Invitations allowed
+    INVITATIONS_ALLOWED: "true"
+    
+    # Show password hint
+    SHOW_PASSWORD_HINT: "false"
+    
+    # Password iterations (increase for better security)
+    PASSWORD_ITERATIONS: "100000"
+    
+    # WebSocket support
+    WEBSOCKET_ENABLED: "true"
+    
+    # Log level
+    LOG_LEVEL: "warn"
+    
+    # Extended logging
+    EXTENDED_LOGGING: "true"
+    
+    # Icon service
+    ICON_CACHE_TTL: "2592000"
+    ICON_CACHE_NEGTTL: "2592000"
+    
+    # Email settings (configure if you want email notifications)
+    # SMTP_HOST: ""
+    # SMTP_FROM: ""
+    # SMTP_PORT: ""
+    # SMTP_SECURITY: ""
+    # SMTP_USERNAME: ""
+    # SMTP_PASSWORD: ""
+    
+    # YubiKey settings (if you have YubiKeys)
+    # YUBICO_CLIENT_ID: ""
+    # YUBICO_SECRET_KEY: ""
+    
+    # Duo settings (if you use Duo)
+    # DUO_IKEY: ""
+    # DUO_SKEY: ""
+    # DUO_HOST: ""
