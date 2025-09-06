@@ -1,0 +1,37 @@
+{{- if .Values.prometheus.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "monitoring.prometheus.fullname" . }}
+  labels:
+    {{- include "monitoring.prometheus.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.prometheus.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.prometheus.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if .Values.prometheus.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.prometheus.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "monitoring.prometheus.selectorLabels" . | nindent 6 }}
+{{- end }}
+
+{{- if .Values.grafana.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "monitoring.grafana.fullname" . }}
+  labels:
+    {{- include "monitoring.grafana.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.grafana.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.grafana.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if .Values.grafana.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.grafana.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "monitoring.grafana.selectorLabels" . | nindent 6 }}
+{{- end }}
