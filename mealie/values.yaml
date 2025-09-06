@@ -93,6 +93,10 @@ persistence:
   storageClass: "shared-hostpath"
   accessMode: ReadWriteMany
   size: 2Gi
+  sharedStorage:
+    enabled: true
+    hostPath: "/opt/mealie-shared"
+    reclaimPolicy: "Retain"
 
 # Mealie specific configuration
 mealie:

@@ -89,9 +89,13 @@ podDisruptionBudget:
 
 persistence:
   enabled: true
-  storageClass: ""
-  accessMode: ReadWriteOnce
+  storageClass: "shared-hostpath"
+  accessMode: ReadWriteMany
   size: 1Gi
+  sharedStorage:
+    enabled: true
+    hostPath: "/opt/vaultwarden-shared"
+    reclaimPolicy: "Retain"
 
 # Vaultwarden specific configuration
 vaultwarden:
