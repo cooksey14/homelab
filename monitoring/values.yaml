@@ -4,6 +4,8 @@
 # Grafana configuration
 grafana:
   enabled: true
+  replicaCount: 1
+  
   image:
     repository: grafana/grafana
     tag: "11.3.0"
@@ -43,6 +45,23 @@ grafana:
     enabled: true
     size: 1Gi
     accessMode: ReadWriteOnce
+    storageClass: ""
+  
+  podSecurityContext:
+    fsGroup: 472
+  
+  securityContext:
+    capabilities:
+      drop:
+      - ALL
+    readOnlyRootFilesystem: false
+    runAsNonRoot: true
+    runAsUser: 472
+  
+  env:
+    GF_SECURITY_ADMIN_PASSWORD: "admin"
+    GF_USERS_ALLOW_SIGN_UP: "false"
+    GF_INSTALL_PLUGINS: "grafana-piechart-panel"
 
 # Prometheus configuration
 prometheus:

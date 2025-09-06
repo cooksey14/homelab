@@ -81,3 +81,24 @@ app.kubernetes.io/component: prometheus
 {{- define "monitoring.prometheus.serviceAccountName" -}}
 {{- printf "%s-prometheus" (include "monitoring.fullname" .) }}
 {{- end }}
+
+{{/*
+Grafana specific helpers
+*/}}
+{{- define "monitoring.grafana.fullname" -}}
+{{- printf "%s-grafana" (include "monitoring.fullname" .) }}
+{{- end }}
+
+{{- define "monitoring.grafana.labels" -}}
+{{ include "monitoring.labels" . }}
+app.kubernetes.io/component: grafana
+{{- end }}
+
+{{- define "monitoring.grafana.selectorLabels" -}}
+{{ include "monitoring.selectorLabels" . }}
+app.kubernetes.io/component: grafana
+{{- end }}
+
+{{- define "monitoring.grafana.serviceAccountName" -}}
+{{- printf "%s-grafana" (include "monitoring.fullname" .) }}
+{{- end }}
