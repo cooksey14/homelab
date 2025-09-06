@@ -15,7 +15,7 @@ spec:
         vaultwarden:
           env:
             # Generate a secure admin token
-            ADMIN_TOKEN: "CHANGE_ME_GENERATE_WITH_OPENSSL_RAND_BASE64_48"
+            ADMIN_TOKEN: "s2duRmIOYy/vi9qnFE0Wi7Ac2t4PlrWlTqLnrCqKOWsmOQdEED3iu7CWEXh+vISH"
             # Set your domain
             DOMAIN: "https://vaultwarden.cooklabs.net"
             # Disable signups in production (enable for initial setup)

@@ -58,8 +58,7 @@ grafana:
     runAsNonRoot: true
     runAsUser: 472
   
-  nodeSelector:
-    kubernetes.io/hostname: worker-node-1
+  nodeSelector: {}
   
   podDisruptionBudget:
     enabled: true
@@ -67,18 +66,20 @@ grafana:
   
   affinity:
     podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app.kubernetes.io/name
-            operator: In
-            values:
-            - monitoring
-          - key: app.kubernetes.io/component
-            operator: In
-            values:
-            - grafana
-        topologyKey: kubernetes.io/hostname
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - monitoring
+            - key: app.kubernetes.io/component
+              operator: In
+              values:
+              - grafana
+          topologyKey: kubernetes.io/hostname
 
 # Prometheus configuration
 prometheus:
@@ -129,18 +130,20 @@ prometheus:
   
   affinity:
     podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app.kubernetes.io/name
-            operator: In
-            values:
-            - monitoring
-          - key: app.kubernetes.io/component
-            operator: In
-            values:
-            - prometheus
-        topologyKey: kubernetes.io/hostname
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - monitoring
+            - key: app.kubernetes.io/component
+              operator: In
+              values:
+              - prometheus
+          topologyKey: kubernetes.io/hostname
 
 # Postgres configuration
 postgres:

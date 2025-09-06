@@ -66,21 +66,22 @@ autoscaling:
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
 
-nodeSelector:
-  kubernetes.io/hostname: worker-node-1
+nodeSelector: {}
 
 tolerations: []
 
 affinity:
   podAntiAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-    - labelSelector:
-        matchExpressions:
-        - key: app.kubernetes.io/name
-          operator: In
-          values:
-          - vaultwarden
-      topologyKey: kubernetes.io/hostname
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - vaultwarden
+        topologyKey: kubernetes.io/hostname
 
 podDisruptionBudget:
   enabled: true
