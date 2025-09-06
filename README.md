@@ -10,7 +10,7 @@ This repository contains the complete GitOps configuration for a K3s cluster run
 - **DNS Domain**: cooklabs.net
 - **GitOps**: Fully automated with ArgoCD
 
-## 🚀 **Deployed Applications**
+## **Deployed Applications**
 
 | Application | Namespace | URL | Status |
 |-------------|-----------|-----|--------|
