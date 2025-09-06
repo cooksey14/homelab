@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/cooksey14/homelab.git
+    repoURL: https://cooksey14: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@github.com/cooksey14/homelab.git
     targetRevision: HEAD
-    path: k3s/applications/monitoring
+    path: monitoring
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
