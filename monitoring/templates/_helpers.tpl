@@ -60,3 +60,24 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Prometheus specific helpers
+*/}}
+{{- define "monitoring.prometheus.fullname" -}}
+{{- printf "%s-prometheus" (include "monitoring.fullname" .) }}
+{{- end }}
+
+{{- define "monitoring.prometheus.labels" -}}
+{{ include "monitoring.labels" . }}
+app.kubernetes.io/component: prometheus
+{{- end }}
+
+{{- define "monitoring.prometheus.selectorLabels" -}}
+{{ include "monitoring.selectorLabels" . }}
+app.kubernetes.io/component: prometheus
+{{- end }}
+
+{{- define "monitoring.prometheus.serviceAccountName" -}}
+{{- printf "%s-prometheus" (include "monitoring.fullname" .) }}
+{{- end }}
