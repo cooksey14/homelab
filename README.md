@@ -47,6 +47,8 @@ k3s/
 ├── metalLB/                 # MetalLB configuration
 ├── certmanager/             # Cert-Manager configuration
 ├── argocd/                  # ArgoCD configuration
+├── ingress-controllers/     # Traefik configuration
+├── scripts/                 # Cluster management scripts
 ├── GITOPS_WORKFLOW.md       # GitOps workflow documentation
 └── README.md               # This file
 ```
@@ -119,6 +121,11 @@ All applications use the `cooklabs.net` domain with A records pointing to the Lo
 - **Multi-node**: Master + Worker node support
 
 ## 🔐 **Security Features**
+
+### **GitHub Authentication**
+- **Secure PAT Management**: GitHub Personal Access Token stored as Kubernetes secret
+- **Environment Variables**: No hardcoded credentials in repository
+- **Template-based**: Use `argocd/github-repository-secret.yaml.template` and `scripts/deploy-github-secret.sh`
 
 ### **TLS Certificates**
 - **Let's Encrypt**: Automatic TLS certificate generation
