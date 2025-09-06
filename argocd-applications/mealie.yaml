@@ -12,8 +12,7 @@ spec:
     helm:
       values: |
         # Override default values for production
-        # TEST: GitOps workflow - changing replica count
-        replicaCount: 3
+        replicaCount: 2
         
         mealie:
           env:
