@@ -24,3 +24,4 @@ spec:
   - hosts:
     - grafana.cooklabs.net
     secretName: grafana-tls
+

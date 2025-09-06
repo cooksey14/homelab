@@ -24,3 +24,4 @@ spec:
   - hosts:
     - prometheus.cooklabs.net
     secretName: prometheus-tls
+
