@@ -12,10 +12,6 @@ on:
 jobs:
   security-scan:
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      actions: read
-      contents: read
     
     steps:
     - name: Checkout code
@@ -26,27 +22,23 @@ jobs:
       with:
         scan-type: 'fs'
         scan-ref: '.'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
+        format: 'table'
+        exit-code: '0'
 
-    - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v3
-      if: always() && github.event_name != 'schedule'
+    - name: Run Trivy vulnerability scanner (JSON output)
+      uses: aquasecurity/trivy-action@master
       with:
-        sarif_file: 'trivy-results.sarif'
-        category: 'trivy-security-scan'
-      continue-on-error: true
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'json'
+        output: 'trivy-results.json'
 
-    - name: Display Trivy results if upload failed
-      if: always() && failure()
-      run: |
-        echo "⚠️ SARIF upload failed, displaying results inline:"
-        if [ -f "trivy-results.sarif" ]; then
-          echo "📊 Trivy Scan Results:"
-          cat trivy-results.sarif | jq -r '.runs[0].results[]? | "\(.level): \(.message.text)"' || echo "Could not parse SARIF results"
-        else
-          echo "No SARIF file found"
-        fi
+    - name: Upload Trivy results as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: trivy-security-results
+        path: trivy-results.json
+        retention-days: 30
 
     - name: Check for secrets in YAML files
       run: |
@@ -79,6 +71,11 @@ jobs:
         echo "🔍 Scan Date: $(date)" >> $GITHUB_STEP_SUMMARY
         echo "🔗 Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "✅ Vulnerability Scan: Completed" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Vulnerability Scan: Completed (see Trivy output above)" >> $GITHUB_STEP_SUMMARY
         echo "✅ Secret Detection: Completed" >> $GITHUB_STEP_SUMMARY
         echo "✅ RBAC Validation: Completed" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📄 Detailed results available in artifacts: trivy-security-results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "💡 Note: GitHub Advanced Security (Code Scanning) requires an Organization account" >> $GITHUB_STEP_SUMMARY
+        echo "Results are available as downloadable artifacts instead." >> $GITHUB_STEP_SUMMARY
