@@ -121,7 +121,6 @@ add_helm_repos() {
     helm repo add bitnami https://charts.bitnami.com/bitnami
     helm repo add traefik https://traefik.github.io/charts
     helm repo add metallb https://metallb.github.io/metallb
-    helm repo add mojo2600 https://mojo2600.github.io/pihole-kubernetes
     helm repo add jetstack https://charts.jetstack.io
     
     helm repo update
@@ -138,7 +137,6 @@ create_namespaces() {
     kubectl create namespace cert-manager --dry-run=client -o yaml | kubectl apply -f -
     kubectl create namespace metallb-system --dry-run=client -o yaml | kubectl apply -f -
     kubectl create namespace mealie --dry-run=client -o yaml | kubectl apply -f -
-    kubectl create namespace pihole --dry-run=client -o yaml | kubectl apply -f -
     
     print_success "Namespaces created"
 }
@@ -319,7 +317,6 @@ install_grafana() {
 apiVersion: v1
 kind: Secret
 metadata:
-  name: grafana-db-secret
   namespace: monitoring
 type: Opaque
 data:
@@ -336,7 +333,6 @@ EOF
         --set database.port=5432 \
         --set database.user=grafana \
         --set database.name=grafana \
-        --set database.password.secretName=grafana-db-secret \
         --set database.password.key=password \
         --wait
     
@@ -411,26 +407,6 @@ EOF
 }
 
 # Function to install Pi-hole
-install_pihole() {
-    print_status "Installing Pi-hole..."
-    
-    helm upgrade --install pihole mojo2600/pihole \
-        --namespace pihole \
-        --create-namespace \
-        --set service.dns.type=LoadBalancer \
-        --set service.web.type=LoadBalancer \
-        --set ingress.enabled=true \
-        --set ingress.className=traefik \
-        --set ingress.hosts[0].host=pihole.$DOMAIN \
-        --set ingress.tls[0].secretName=pihole-tls \
-        --set ingress.tls[0].hosts[0]=pihole.$DOMAIN \
-        --set ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt-prod-dns \
-        --wait
-    
-    wait_for_pods "pihole"
-    
-    print_success "Pi-hole installed"
-}
 
 # Function to install Mealie
 install_mealie() {
@@ -561,7 +537,6 @@ main() {
     install_prometheus
     install_grafana
     install_argocd
-    install_pihole
     install_mealie
     
     display_cluster_info

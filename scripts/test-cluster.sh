@@ -199,7 +199,6 @@ main() {
         echo "  ArgoCD: https://argocd.cooklabs.net"
         echo "  Grafana: http://192.168.86.27:30180 (admin/admin)"
         echo "  Mealie: https://mealie.cooklabs.net"
-        echo "  Pi-hole: https://pihole.cooklabs.net"
         return 0
     else
         print_warning "Some tests failed. Check the output above for details."
