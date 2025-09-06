@@ -11,27 +11,19 @@ spec:
     targetRevision: HEAD
     helm:
       values: |
-        # Override default values for production
         replicaCount: 2
         
         mealie:
           env:
-            # Generate a secure secret key
             SECRET_KEY: "CHANGE_ME_GENERATE_SECRET_KEY"
-            # Set your timezone
             TZ: "America/Chicago"
-            # Database settings
             DATABASE_URL: "sqlite:///app/data/mealie.db"
-            # Default user (change after first login)
             DEFAULT_USER: "admin"
             DEFAULT_PASSWORD: "changeme"
-            # Security settings
             ENABLE_SIGNUP: "true"
             ENABLE_OPENAPI: "true"
-            # Performance settings
             WEB_CONCURRENCY: "1"
             WORKERS_PER_CORE: "1"
-            # Logging
             LOG_LEVEL: "INFO"
         
         # Resource limits

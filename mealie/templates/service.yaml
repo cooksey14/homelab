@@ -13,4 +13,3 @@ spec:
       name: http
   selector:
     {{- include "mealie.selectorLabels" . | nindent 4 }}
-

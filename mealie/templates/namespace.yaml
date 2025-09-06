@@ -4,4 +4,3 @@ metadata:
   name: {{ .Release.Namespace }}
   labels:
     {{- include "mealie.labels" . | nindent 4 }}
-

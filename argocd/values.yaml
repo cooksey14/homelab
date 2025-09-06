@@ -13,6 +13,5 @@ server:
           - argocd.cooklabs.net
         secretName: argocd-tls
   extraArgs:
-    - --basehref=/ # Corrects the serving path
-    - --insecure # Skip HTTPS - Traefik handles SSL termination
-
+    - --basehref=/
+    - --insecure

@@ -125,7 +125,7 @@ vaultwarden:
     ICON_CACHE_TTL: "2592000"
     ICON_CACHE_NEGTTL: "2592000"
     
-    # Email settings (configure if you want email notifications)
+    # Email settings
     # SMTP_HOST: ""
     # SMTP_FROM: ""
     # SMTP_PORT: ""
@@ -133,11 +133,11 @@ vaultwarden:
     # SMTP_USERNAME: ""
     # SMTP_PASSWORD: ""
     
-    # YubiKey settings (if you have YubiKeys)
+    # YubiKey settings
     # YUBICO_CLIENT_ID: ""
     # YUBICO_SECRET_KEY: ""
     
-    # Duo settings (if you use Duo)
+    # Duo settings
     # DUO_IKEY: ""
     # DUO_SKEY: ""
     # DUO_HOST: ""
