@@ -1,112 +1,260 @@
-# K3s Cluster Configuration
+# K3s Cluster GitOps Configuration
 
-This repository contains the complete GitOps configuration for your K3s cluster running on Raspberry Pi nodes.
+This repository contains the complete GitOps configuration for your K3s cluster running on Raspberry Pi nodes, managed entirely through ArgoCD.
 
-## Cluster Overview
+## 🎯 **Cluster Overview**
 
 - **Master Node**: 192.168.86.27 (pimaster)
-- **Applications**: ArgoCD, Grafana, Prometheus, PostgreSQL, Mealie, Cert-Manager, MetalLB
-- **Ingress Controllers**: Traefik (192.168.86.102), Nginx (192.168.86.101)
+- **Worker Node**: 192.168.86.238 (colin)
+- **LoadBalancer IP**: 192.168.86.101 (MetalLB)
+- **DNS Domain**: cooklabs.net
+- **GitOps**: Fully automated with ArgoCD
 
-## Directory Structure
+## 🚀 **Deployed Applications**
+
+| Application | Namespace | URL | Status |
+|-------------|-----------|-----|--------|
+| **ArgoCD** | argocd | https://argocd.cooklabs.net | ✅ Running |
+| **Mealie** | mealie | https://mealie.cooklabs.net | ✅ Running |
+| **Vaultwarden** | vaultwarden | https://vaultwarden.cooklabs.net | ✅ Running |
+| **Grafana** | monitoring | https://grafana.cooklabs.net | ✅ Running |
+| **Prometheus** | monitoring | https://prometheus.cooklabs.net | ✅ Running |
+| **PostgreSQL** | monitoring | Internal | ✅ Running |
+
+## 📁 **Repository Structure**
 
 ```
 k3s/
-├── namespaces/           # Namespace definitions
-├── applications/         # Application configurations
-│   ├── monitoring/       # Grafana, Prometheus, PostgreSQL
-│   └── mealie/          # Mealie recipe app
-├── argocd/              # ArgoCD configuration
-├── argocd-applications/ # ArgoCD Application definitions
-├── certmanager/         # Cert-Manager configuration
-├── metalLB/             # MetalLB configuration
-├── ingress-controllers/ # Traefik and Nginx configurations
-└── secrets/              # Secret definitions
+├── argocd-applications/     # ArgoCD Application definitions
+│   ├── mealie.yaml          # Mealie Helm chart application
+│   ├── monitoring.yaml      # Monitoring stack application
+│   ├── namespaces.yaml      # Namespace definitions
+│   ├── vaultwarden.yaml     # Vaultwarden application
+│   └── root-app.yaml        # Application of Applications
+├── mealie/                  # Mealie Helm chart
+│   ├── Chart.yaml
+│   ├── values.yaml
+│   └── templates/
+├── monitoring/              # Monitoring Helm chart
+│   ├── Chart.yaml
+│   ├── values.yaml
+│   └── templates/
+├── vaultwarden/            # Vaultwarden Helm chart
+│   ├── Chart.yaml
+│   ├── values.yaml
+│   └── templates/
+├── namespaces/              # Namespace definitions
+├── metalLB/                 # MetalLB configuration
+├── certmanager/             # Cert-Manager configuration
+├── argocd/                  # ArgoCD configuration
+├── GITOPS_WORKFLOW.md       # GitOps workflow documentation
+└── README.md               # This file
 ```
 
-## Current Applications
+## 🔄 **GitOps Workflow**
 
-### ArgoCD
-- **Namespace**: argocd
-- **URL**: https://argocd.cooklabs.net
-- **Status**: Running (7 pods)
+This cluster uses **ArgoCD** for complete GitOps automation:
 
-### Monitoring Stack
-- **Namespace**: monitoring
-- **Components**:
-  - Grafana: NodePort 30180
-  - Prometheus: NodePort 30089 (needs fixing)
-  - PostgreSQL: ClusterIP service
+### **How It Works**
+1. **Make changes** in Git (edit YAML files)
+2. **Commit and push** to GitHub
+3. **ArgoCD automatically detects** changes within 30 seconds
+4. **ArgoCD automatically syncs** changes to the cluster
+5. **Applications update** automatically with no manual intervention
 
-### Mealie
-- **Namespace**: mealie
-- **URL**: https://mealie.cooklabs.net
-- **LoadBalancer IP**: 192.168.86.108
-
-### Cert-Manager
-- **Namespace**: cert-manager
-- **Issuers**: Let's Encrypt (HTTP and DNS challenges)
-
-### MetalLB
-- **Namespace**: metallb-system
-- **IP Pool**: 192.168.86.100-192.168.86.110
-
-## Issues Found and Fixed
-
-1. **Missing grafana-db-secret**: Created with PostgreSQL password
-2. **Prometheus misconfiguration**: Was running nginx instead of Prometheus
-3. **Missing namespace definitions**: Created for all namespaces
-4. **Missing Helm values**: Exported current configurations
-
-## Next Steps
-
-1. **Apply the grafana-db-secret**:
-   ```bash
-   kubectl apply -f k3s/secrets/grafana-db-secret.yaml
-   ```
-
-2. **Fix Prometheus deployment**:
-   ```bash
-   kubectl delete deployment prometheus -n monitoring
-   kubectl apply -f k3s/applications/monitoring/prometheus/
-   ```
-
-3. **Set up GitOps with ArgoCD**:
-   - Push this repository to GitHub
-   - Update ArgoCD Application URLs
-   - Apply ArgoCD Applications
-
-4. **Create GitHub repository**:
-   - Initialize git repository
-   - Push to GitHub
-   - Update ArgoCD Application repoURLs
-
-## Deployment Commands
-
+### **Making Changes**
 ```bash
-# Apply namespaces
-kubectl apply -f k3s/namespaces/
+# Edit any application configuration
+vim argocd-applications/mealie.yaml
 
-# Apply secrets
-kubectl apply -f k3s/secrets/
+# Commit and push
+git add argocd-applications/mealie.yaml
+git commit -m "Update mealie configuration"
+git push
 
-# Apply applications
-kubectl apply -f k3s/applications/monitoring/prometheus/
-kubectl apply -f k3s/applications/mealie/
-
-# Apply ArgoCD applications (after setting up Git repo)
-kubectl apply -f k3s/argocd-applications/
+# ArgoCD automatically syncs within 30 seconds
+# No manual kubectl commands needed!
 ```
 
-## SSH Access
+### **Application of Applications Pattern**
+- **Root Application** (`root-app`) manages all other applications
+- **Single point of control** for the entire GitOps workflow
+- **Self-managing** - manages itself and all child applications
 
+## 🛠️ **Infrastructure Components**
+
+### **Core Infrastructure**
+- **K3s**: Lightweight Kubernetes distribution
+- **MetalLB**: LoadBalancer service for bare metal
+- **Traefik**: Ingress controller for external access
+- **Cert-Manager**: Automatic TLS certificate management
+
+### **GitOps & Monitoring**
+- **ArgoCD**: GitOps continuous delivery
+- **Grafana**: Metrics visualization and dashboards
+- **Prometheus**: Metrics collection and alerting
+- **PostgreSQL**: Database for monitoring data
+
+### **Applications**
+- **Mealie**: Recipe management application
+- **Vaultwarden**: Self-hosted password manager
+
+## 🌐 **Network Configuration**
+
+### **DNS Setup (Cloudflare)**
+All applications use the `cooklabs.net` domain with A records pointing to the LoadBalancer IP:
+
+| Domain | IP Address | Purpose |
+|--------|------------|---------|
+| argocd.cooklabs.net | 192.168.86.101 | ArgoCD GitOps UI |
+| mealie.cooklabs.net | 192.168.86.101 | Recipe management |
+| vaultwarden.cooklabs.net | 192.168.86.101 | Password manager |
+| grafana.cooklabs.net | 192.168.86.101 | Monitoring dashboards |
+| prometheus.cooklabs.net | 192.168.86.101 | Metrics collection |
+
+### **LoadBalancer Configuration**
+- **MetalLB IP Pool**: 192.168.86.100-192.168.86.110
+- **Primary LoadBalancer IP**: 192.168.86.101
+- **L2 Advertisement**: On wlan0 interface
+- **Multi-node**: Master + Worker node support
+
+## 🔐 **Security Features**
+
+### **TLS Certificates**
+- **Let's Encrypt**: Automatic TLS certificate generation
+- **DNS Challenge**: Uses Cloudflare DNS for validation
+- **Auto-renewal**: Certificates automatically renewed
+
+### **Security Contexts**
+- **Non-root containers**: All applications run as non-root users
+- **Read-only filesystems**: Where appropriate
+- **Resource limits**: CPU and memory limits defined
+- **Network policies**: Ingress controllers with TLS
+
+## 📊 **Monitoring & Observability**
+
+### **ArgoCD Monitoring**
+- **UI**: https://argocd.cooklabs.net
+- **Auto-sync**: All applications sync automatically
+- **Health checks**: Continuous health monitoring
+- **Sync history**: Complete audit trail of changes
+
+### **Application Monitoring**
+- **Grafana**: https://grafana.cooklabs.net
+- **Prometheus**: https://prometheus.cooklabs.net
+- **Metrics**: CPU, memory, network, and custom metrics
+- **Alerting**: Configurable alerts and notifications
+
+## 🚀 **Quick Start**
+
+### **1. Access ArgoCD**
 ```bash
-ssh -i /Users/colin/pi/pi pimaster@192.168.86.27
+# Get ArgoCD admin password
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+# Access ArgoCD UI
+open https://argocd.cooklabs.net
 ```
 
-## Monitoring URLs
+### **2. Check Application Status**
+```bash
+# Check all ArgoCD applications
+kubectl get applications -n argocd
 
-- Grafana: http://192.168.86.27:30180 (admin/admin)
-- Prometheus: http://192.168.86.27:30089
-- ArgoCD: https://argocd.cooklabs.net
-- Mealie: https://mealie.cooklabs.net
+# Check specific application
+kubectl describe application mealie -n argocd
+```
+
+### **3. Make Configuration Changes**
+```bash
+# Edit application configuration
+vim argocd-applications/mealie.yaml
+
+# Commit and push (ArgoCD will auto-sync)
+git add argocd-applications/mealie.yaml
+git commit -m "Update mealie configuration"
+git push
+```
+
+## 🔧 **Troubleshooting**
+
+### **Check Application Health**
+```bash
+# Check all pods
+kubectl get pods -A
+
+# Check ArgoCD applications
+kubectl get applications -n argocd
+
+# Check specific application logs
+kubectl logs -n argocd deployment/argocd-application-controller
+```
+
+### **Common Issues**
+
+1. **Application OutOfSync**
+   - Check Git repository access
+   - Verify GitHub token is valid
+   - Check ArgoCD application logs
+
+2. **DNS Resolution Issues**
+   - Verify Cloudflare DNS records
+   - Check LoadBalancer IP assignment
+   - Test with `nslookup domain.cooklabs.net`
+
+3. **TLS Certificate Issues**
+   - Check Cert-Manager logs
+   - Verify DNS challenge configuration
+   - Check Let's Encrypt rate limits
+
+### **Emergency Manual Sync**
+```bash
+# Only use in emergencies when GitOps is broken
+kubectl patch application mealie -n argocd --type merge -p '{"operation":{"sync":{"syncStrategy":{"hook":{"force":true}}}}}'
+```
+
+## 📚 **Documentation**
+
+- **GitOps Workflow**: See `GITOPS_WORKFLOW.md` for detailed GitOps procedures
+- **Application Charts**: Each application has its own Helm chart with documentation
+- **ArgoCD UI**: https://argocd.cooklabs.net for visual management
+
+## 🔄 **Updates and Maintenance**
+
+### **Automatic Updates**
+- **GitOps**: All changes go through Git commits
+- **Auto-sync**: ArgoCD automatically syncs changes
+- **Health monitoring**: Continuous health checks
+- **Rollback**: Easy rollback through Git history
+
+### **Best Practices**
+- ✅ **Make all changes in Git**
+- ✅ **Use descriptive commit messages**
+- ✅ **Let ArgoCD handle automatic sync**
+- ✅ **Monitor application health**
+- ❌ **Avoid manual kubectl patches**
+- ❌ **Don't bypass Git workflow**
+
+## 🆘 **Support**
+
+If you encounter issues:
+
+1. **Check ArgoCD UI**: https://argocd.cooklabs.net
+2. **Review GitOps workflow**: See `GITOPS_WORKFLOW.md`
+3. **Check application logs**: Use kubectl commands above
+4. **Verify DNS configuration**: Check Cloudflare settings
+5. **Test network connectivity**: Verify LoadBalancer IP
+
+## 🎉 **Benefits of This Setup**
+
+- **🔄 Complete GitOps**: All changes tracked in Git
+- **⚡ Automatic Sync**: No manual intervention required
+- **📊 Full Observability**: Comprehensive monitoring stack
+- **🔐 Production Ready**: TLS, security contexts, resource limits
+- **🌐 External Access**: All applications accessible via domain names
+- **🛡️ High Availability**: Multi-node cluster with LoadBalancer
+- **📈 Scalable**: Easy to add more applications and nodes
+
+---
+
+**This cluster is now fully operational with production-ready GitOps workflow!** 🚀

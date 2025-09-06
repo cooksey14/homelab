@@ -1,3 +1,4 @@
+
 # GitOps Workflow for ArgoCD Applications
 
 This document describes the proper GitOps workflow for managing ArgoCD applications without manual `kubectl patch` commands.
