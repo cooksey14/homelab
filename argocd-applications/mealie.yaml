@@ -11,6 +11,7 @@ spec:
     targetRevision: HEAD
     helm:
       values: |
+        # TEST: GitOps workflow test - $(date)
         # Override default values for production
         mealie:
           env:
