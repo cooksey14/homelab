@@ -58,10 +58,8 @@ grafana:
     runAsNonRoot: true
     runAsUser: 472
   
-  env:
-    GF_SECURITY_ADMIN_PASSWORD: "admin"
-    GF_USERS_ALLOW_SIGN_UP: "false"
-    GF_INSTALL_PLUGINS: "grafana-piechart-panel"
+  nodeSelector:
+    kubernetes.io/hostname: worker-node-1
   
   podDisruptionBudget:
     enabled: true
@@ -69,20 +67,18 @@ grafana:
   
   affinity:
     podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          labelSelector:
-            matchExpressions:
-            - key: app.kubernetes.io/name
-              operator: In
-              values:
-              - monitoring
-            - key: app.kubernetes.io/component
-              operator: In
-              values:
-              - grafana
-          topologyKey: kubernetes.io/hostname
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - monitoring
+          - key: app.kubernetes.io/component
+            operator: In
+            values:
+            - grafana
+        topologyKey: kubernetes.io/hostname
 
 # Prometheus configuration
 prometheus:
@@ -133,20 +129,18 @@ prometheus:
   
   affinity:
     podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          labelSelector:
-            matchExpressions:
-            - key: app.kubernetes.io/name
-              operator: In
-              values:
-              - monitoring
-            - key: app.kubernetes.io/component
-              operator: In
-              values:
-              - prometheus
-          topologyKey: kubernetes.io/hostname
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - monitoring
+          - key: app.kubernetes.io/component
+            operator: In
+            values:
+            - prometheus
+        topologyKey: kubernetes.io/hostname
 
 # Postgres configuration
 postgres:
