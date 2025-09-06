@@ -35,7 +35,7 @@ spec:
             pathType: {{ .pathType }}
             backend:
               service:
-                name: grafana
+                name: {{ include "monitoring.grafana.fullname" $ }}
                 port:
                   number: {{ $.Values.grafana.service.port }}
           {{- end }}
