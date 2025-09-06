@@ -93,7 +93,7 @@ podDisruptionBudget:
 
 persistence:
   enabled: true
-  storageClass: "shared-hostpath"
+  storageClass: "vaultwarden-shared-hostpath"
   accessMode: ReadWriteMany
   size: 1Gi
   sharedStorage:
