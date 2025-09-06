@@ -7,19 +7,89 @@ spec:
   project: default
   source:
     repoURL: https://cooksey14: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@github.com/cooksey14/homelab.git
-    targetRevision: HEAD
     path: mealie
+    targetRevision: HEAD
+    helm:
+      values: |
+        # Override default values for production
+        mealie:
+          env:
+            # Generate a secure secret key
+            SECRET_KEY: "CHANGE_ME_GENERATE_SECRET_KEY"
+            # Set your timezone
+            TZ: "America/Chicago"
+            # Database settings
+            DATABASE_URL: "sqlite:///app/data/mealie.db"
+            # Default user (change after first login)
+            DEFAULT_USER: "admin"
+            DEFAULT_PASSWORD: "changeme"
+            # Security settings
+            ENABLE_SIGNUP: "true"
+            ENABLE_OPENAPI: "true"
+            # Performance settings
+            WEB_CONCURRENCY: "1"
+            WORKERS_PER_CORE: "1"
+            # Logging
+            LOG_LEVEL: "INFO"
+        
+        # Resource limits
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        
+        # Persistence settings
+        persistence:
+          enabled: true
+          size: 2Gi
+          accessMode: ReadWriteOnce
+        
+        # Health checks
+        mealie:
+          healthCheck:
+            enabled: true
+            path: "/api/health"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            enabled: true
+            path: "/api/health"
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+        
+        # Ingress settings
+        ingress:
+          enabled: true
+          className: "traefik"
+          annotations:
+            cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
+            traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+            traefik.ingress.kubernetes.io/router.tls: "true"
+          hosts:
+            - host: mealie.cooklabs.net
+              paths:
+                - path: /
+                  pathType: Prefix
+          tls:
+            - secretName: mealie-tls
+              hosts:
+                - mealie.cooklabs.net
   destination:
     server: https://kubernetes.default.svc
     namespace: mealie
   syncPolicy:
-    # Manual sync only - no automatic sync
+    automated:
+      prune: false
+      selfHeal: false
     syncOptions:
     - CreateNamespace=true
     - Prune=true
     - PrunePropagationPolicy=foreground
     - PruneLast=true
-    # Manual sync only - no sync windows (24/7 available)
-    automated:
-      prune: false
-      selfHeal: false

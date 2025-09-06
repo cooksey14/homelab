@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mealie.fullname" . }}
+  labels:
+    {{- include "mealie.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "mealie.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mealie.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mealie.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          env:
+            {{- range $key, $value := .Values.mealie.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{- if .Values.mealie.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.mealie.livenessProbe.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.mealie.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.mealie.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.mealie.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.mealie.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.mealie.healthCheck.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.mealie.healthCheck.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.mealie.healthCheck.initialDelaySeconds }}
+            periodSeconds: {{ .Values.mealie.healthCheck.periodSeconds }}
+            timeoutSeconds: {{ .Values.mealie.healthCheck.timeoutSeconds }}
+            failureThreshold: {{ .Values.mealie.healthCheck.failureThreshold }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+      volumes:
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "mealie.fullname" . }}-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
