@@ -7,19 +7,87 @@ spec:
   project: default
   source:
     repoURL: https://cooksey14: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@github.com/cooksey14/homelab.git
-    targetRevision: HEAD
     path: monitoring
+    targetRevision: HEAD
+    helm:
+      values: |
+        # Grafana configuration
+        grafana:
+          enabled: true
+          ingress:
+            enabled: true
+            className: "traefik"
+            annotations:
+              cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
+              traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+              traefik.ingress.kubernetes.io/router.tls: "true"
+            hosts:
+              - host: grafana.cooklabs.net
+                paths:
+                  - path: /
+                    pathType: Prefix
+            tls:
+              - secretName: grafana-tls
+                hosts:
+                  - grafana.cooklabs.net
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+        
+        # Prometheus configuration
+        prometheus:
+          enabled: true
+          ingress:
+            enabled: true
+            className: "traefik"
+            annotations:
+              cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
+              traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+              traefik.ingress.kubernetes.io/router.tls: "true"
+            hosts:
+              - host: prometheus.cooklabs.net
+                paths:
+                  - path: /
+                    pathType: Prefix
+            tls:
+              - secretName: prometheus-tls
+                hosts:
+                  - prometheus.cooklabs.net
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+        
+        # Postgres configuration
+        postgres:
+          enabled: true
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          env:
+            POSTGRES_DB: "monitoring"
+            POSTGRES_USER: "postgres"
+            POSTGRES_PASSWORD: "changeme"
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
   syncPolicy:
-    # Manual sync only - no automatic sync
+    automated:
+      prune: false
+      selfHeal: false
     syncOptions:
     - CreateNamespace=true
     - Prune=true
     - PrunePropagationPolicy=foreground
     - PruneLast=true
-    # Manual sync only - no sync windows (24/7 available)
-    automated:
-      prune: false
-      selfHeal: false

@@ -1,0 +1,14 @@
+apiVersion: v2
+name: monitoring
+description: A Helm chart for monitoring stack (Grafana, Prometheus, Postgres)
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - monitoring
+  - grafana
+  - prometheus
+  - postgres
+maintainers:
+  - name: Colin Cook
+    email: colin.cook@beyondidentity.com

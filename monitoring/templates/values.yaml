@@ -1,0 +1,146 @@
+# Default values for monitoring
+# This is a YAML-formatted file.
+
+# Grafana configuration
+grafana:
+  enabled: true
+  image:
+    repository: grafana/grafana
+    tag: "11.3.0"
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: NodePort
+    port: 3000
+    nodePort: 30180
+  
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    hosts:
+      - host: grafana.cooklabs.net
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: grafana-tls
+        hosts:
+          - grafana.cooklabs.net
+  
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  
+  persistence:
+    enabled: true
+    size: 1Gi
+    accessMode: ReadWriteOnce
+
+# Prometheus configuration
+prometheus:
+  enabled: true
+  image:
+    repository: prom/prometheus
+    tag: "v2.48.0"
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: NodePort
+    port: 80
+    nodePort: 30089
+  
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    hosts:
+      - host: prometheus.cooklabs.net
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: prometheus-tls
+        hosts:
+          - prometheus.cooklabs.net
+  
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  
+  persistence:
+    enabled: true
+    size: 2Gi
+    accessMode: ReadWriteOnce
+
+# Postgres configuration
+postgres:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "17.2"
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 5432
+  
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  
+  persistence:
+    enabled: true
+    size: 2Gi
+    accessMode: ReadWriteOnce
+  
+  env:
+    POSTGRES_DB: "monitoring"
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "changeme"
+
+# Common settings
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
