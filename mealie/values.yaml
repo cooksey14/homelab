@@ -82,6 +82,12 @@ affinity:
             values:
             - mealie
         topologyKey: kubernetes.io/hostname
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: node-role.kubernetes.io/worker
+          operator: Exists
 
 podDisruptionBudget:
   enabled: true
