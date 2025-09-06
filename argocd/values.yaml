@@ -112,4 +112,4 @@ notifications:
 
 # ApplicationSet controller
 applicationSet:
-  enabled: true
+  enabled: true 
