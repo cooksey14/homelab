@@ -1,0 +1,49 @@
+{{- if .Values.argocd.enabled }}
+# This template uses the official ArgoCD Helm chart
+# The actual ArgoCD installation is managed by the official chart
+# This template only adds our custom configurations
+
+# Repository Secret
+{{- if .Values.repositorySecrets.enabled }}
+{{- if .Values.repositorySecrets.github.enabled }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: github-repo-secret
+  namespace: argocd
+  labels:
+    {{- include "argocd.labels" . | nindent 4 }}
+type: Opaque
+stringData:
+  type: git
+  url: https://github.com/cooksey14/homelab.git
+  username: {{ .Values.repositorySecrets.github.username }}
+  password: ""  # Set via ArgoCD UI or kubectl
+{{- end }}
+{{- end }}
+
+# Custom Ingress (if needed)
+{{- if .Values.argocd.server.ingress.enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "argocd.fullname" . }}-ingress
+  namespace: argocd
+  labels:
+    {{- include "argocd.labels" . | nindent 4 }}
+  annotations:
+    {{- toYaml .Values.argocd.server.ingress.annotations | nindent 4 }}
+spec:
+  {{- if .Values.argocd.server.ingress.className }}
+  ingressClassName: {{ .Values.argocd.server.ingress.className }}
+  {{- end }}
+  {{- if .Values.argocd.server.ingress.tls }}
+  tls:
+    {{- toYaml .Values.argocd.server.ingress.tls | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- toYaml .Values.argocd.server.ingress.hosts | nindent 4 }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,16 @@
+apiVersion: v2
+name: argocd
+description: A Helm chart for ArgoCD
+type: application
+version: 0.1.0
+appVersion: "2.8.4"
+keywords:
+  - argocd
+  - gitops
+  - continuous-delivery
+home: https://argo-cd.readthedocs.io/
+sources:
+  - https://github.com/argoproj/argo-cd
+maintainers:
+  - name: Colin Cook
+    email: cook.colin13@gmail.com

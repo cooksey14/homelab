@@ -1,0 +1,90 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://argoproj.github.io/argo-helm
+    chart: argo-cd
+    targetRevision: 5.51.6
+    helm:
+      values: |
+        # ArgoCD server configuration
+        server:
+          service:
+            type: LoadBalancer
+          ingress:
+            enabled: true
+            ingressClassName: "traefik"
+            annotations:
+              cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
+              traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+              traefik.ingress.kubernetes.io/router.tls: "true"
+            hosts:
+              - argocd.cooklabs.net
+            tls:
+              - secretName: argocd-tls
+                hosts:
+                  - argocd.cooklabs.net
+        
+        # Repository configuration
+        configs:
+          repositories:
+            homelab:
+              type: git
+              url: https://github.com/cooksey14/homelab.git
+              name: homelab
+        
+        # Resource configuration
+        global:
+          image:
+            repository: quay.io/argoproj/argocd
+            tag: "v3.0.12"
+        
+        # Component configuration
+        dex:
+          enabled: true
+        notifications:
+          enabled: true
+        applicationSet:
+          enabled: true
+        
+        # Redis persistence
+        redis:
+          enabled: true
+          persistence:
+            enabled: true
+            size: 1Gi
+            storageClass: "local-path"
+        
+        # Resource limits
+        server:
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+        controller:
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - Prune=true
+    - PrunePropagationPolicy=foreground
+    - PruneLast=true

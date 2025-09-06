@@ -48,8 +48,13 @@ spec:
         # Persistence settings
         persistence:
           enabled: true
+          storageClass: "vaultwarden-shared-hostpath"
+          accessMode: ReadWriteMany
           size: 2Gi
-          accessMode: ReadWriteOnce
+          sharedStorage:
+            enabled: true
+            hostPath: "/opt/vaultwarden-shared"
+            reclaimPolicy: "Retain"
         
         # Ingress settings
         ingress:

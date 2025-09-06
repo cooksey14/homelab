@@ -1,17 +1,115 @@
-server:
-  ingress:
+# Default values for argocd
+# This is a YAML-formatted file.
+
+# ArgoCD configuration
+argocd:
+  # Server configuration
+  server:
+    # Service configuration
+    service:
+      type: LoadBalancer
+      port: 80
+      targetPort: 8080
+    
+    # Ingress configuration
+    ingress:
+      enabled: true
+      className: "traefik"
+      annotations:
+        cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
+        traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+        traefik.ingress.kubernetes.io/router.tls: "true"
+      hosts:
+        - host: argocd.cooklabs.net
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: argocd-tls
+          hosts:
+            - argocd.cooklabs.net
+    
+    # Additional configuration
+    config:
+      # Repository configuration
+      repositories: |
+        - type: git
+          url: https://github.com/cooksey14/homelab.git
+          name: homelab
+      
+      # Application controller configuration
+      application.instanceLabelKey: argocd.argoproj.io/instance
+      
+      # Server configuration
+      server.rbac.log.enforce.enable: "true"
+      server.rbac.log.enforce.enable: "true"
+      
+      # OIDC configuration (if needed)
+      # oidc.config: |
+      #   name: OIDC
+      #   issuer: https://your-oidc-provider.com
+      #   clientId: your-client-id
+      #   clientSecret: $oidc.clientSecret
+      #   requestedScopes: ["openid", "profile", "email", "groups"]
+      #   requestedIDTokenClaims: {"groups": {"essential": true}}
+
+# Repository secrets
+repositorySecrets:
+  enabled: true
+  github:
     enabled: true
-    ingressClassName: traefik
-    hosts:
-      - argocd.cooklabs.net
-    annotations:
-      traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-      traefik.ingress.kubernetes.io/router.tls: "true"
-      cert-manager.io/cluster-issuer: letsencrypt-prod-dns
-    tls:
-      - hosts:
-          - argocd.cooklabs.net
-        secretName: argocd-tls
-  extraArgs:
-    - --basehref=/
-    - --insecure
+    username: "cooksey14"
+    # Password/token should be set via ArgoCD UI or kubectl
+
+# Global configuration
+global:
+  # Image configuration
+  image:
+    repository: quay.io/argoproj/argocd
+    tag: "v2.8.4"
+    pullPolicy: IfNotPresent
+  
+  # Security context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    fsGroup: 999
+  
+  # Service account
+  serviceAccount:
+    create: true
+    name: argocd-server
+
+# Resource configuration
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# Node selector and affinity
+nodeSelector: {}
+affinity: {}
+tolerations: []
+
+# Persistence (for Redis)
+redis:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: "local-path"
+
+# Dex (for SSO)
+dex:
+  enabled: true
+
+# Notifications
+notifications:
+  enabled: true
+
+# ApplicationSet controller
+applicationSet:
+  enabled: true
