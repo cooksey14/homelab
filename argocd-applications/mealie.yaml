@@ -12,6 +12,9 @@ spec:
     helm:
       values: |
         # Override default values for production
+        # TEST: GitOps workflow - changing replica count
+        replicaCount: 3
+        
         mealie:
           env:
             # Generate a secure secret key
