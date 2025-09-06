@@ -89,7 +89,6 @@ podDisruptionBudget:
 
 persistence:
   enabled: true
-  existingClaim: "mealie-shared-data"
   storageClass: "shared-hostpath"
   accessMode: ReadWriteMany
   size: 2Gi
