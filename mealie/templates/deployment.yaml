@@ -70,8 +70,13 @@ spec:
       volumes:
         - name: data
           {{- if .Values.persistence.enabled }}
+          {{- if .Values.persistence.existingClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim }}
+          {{- else }}
           persistentVolumeClaim:
             claimName: {{ include "mealie.fullname" . }}-data
+          {{- end }}
           {{- else }}
           emptyDir: {}
           {{- end }}
