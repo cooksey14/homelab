@@ -17,10 +17,13 @@ spec:
             type: ClusterIP
           ingress:
             enabled: false
-          insecure: true
+          insecure: false
         configs:
           params:
-            server.insecure: true
+            server.insecure: false
+          cm:
+            url: https://argocd.cooklabs.net
+            server.insecure: false
 
         # Repository configuration
         configs:
