@@ -14,7 +14,9 @@ spec:
         # ArgoCD server configuration
         server:
           service:
-            type: ClusterIP
+            type: LoadBalancer
+            annotations:
+              metallb.universe.tf/address-pool: default
           ingress:
             enabled: false
           insecure: false
