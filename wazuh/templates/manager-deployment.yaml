@@ -40,6 +40,15 @@ spec:
               # Fix permissions for PID files
               chmod 777 /var/ossec/var/run/
               
+              # Create SSL certificates for API daemon
+              mkdir -p /var/ossec/api/configuration/ssl
+              if [ ! -f /var/ossec/api/configuration/ssl/server.key ]; then
+                echo "Creating SSL certificates for API daemon..."
+                openssl req -x509 -newkey rsa:4096 -keyout /var/ossec/api/configuration/ssl/server.key -out /var/ossec/api/configuration/ssl/server.crt -days 365 -nodes -subj "/C=US/ST=CA/L=San Francisco/O=Wazuh/CN=wazuh-manager"
+                chmod 600 /var/ossec/api/configuration/ssl/server.key
+                chmod 644 /var/ossec/api/configuration/ssl/server.crt
+              fi
+              
               # Start core Wazuh daemons in background
               /var/ossec/bin/wazuh-db -d
               sleep 2
