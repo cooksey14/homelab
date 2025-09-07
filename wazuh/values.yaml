@@ -103,6 +103,11 @@ indexer:
     runAsGroup: 0
     runAsNonRoot: false
     privileged: true
+    allowPrivilegeEscalation: true
+    capabilities:
+      add:
+        - ALL
+      drop: []
   command: ["/bin/bash"]
   args: ["-c", "ls -la / && if [ -f /entrypoint.sh ]; then chmod +x /entrypoint.sh && /entrypoint.sh; else echo 'No entrypoint.sh found, trying direct opensearch start'; /usr/share/opensearch/bin/opensearch; fi"]
   env:
