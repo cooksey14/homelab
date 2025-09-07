@@ -122,6 +122,9 @@ spec:
             - name: wazuh-manager-config
               mountPath: /var/ossec/etc/internal_options.conf
               subPath: internal_options.conf
+            - name: wazuh-manager-config
+              mountPath: /var/ossec/etc/shared/ar.conf
+              subPath: ar.conf
             - name: wazuh-ossec-logs
               mountPath: /var/ossec/logs
       volumes:
