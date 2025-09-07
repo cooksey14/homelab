@@ -56,6 +56,16 @@ spec:
             runAsGroup: 0
             runAsNonRoot: false
             privileged: true
+            capabilities:
+              add:
+              - SYS_CHROOT
+              - CHOWN
+              - DAC_OVERRIDE
+              - FOWNER
+              - FSETID
+              - KILL
+              - SETGID
+              - SETUID
           env:
             - name: "OPENSEARCH_JAVA_OPTS"
               value: "-Xms1g -Xmx1g"
@@ -89,7 +99,8 @@ spec:
               value: "wazuh-manager"
             - name: WAZUH_MANAGER_PORT
               value: "55000"
-            - name: OPENSEARCH_DASHBOARDS_ALLOW_ROOT
+            - name: 
+            _DASHBOARDS_ALLOW_ROOT
               value: "true"
           config:
             username: "admin"
