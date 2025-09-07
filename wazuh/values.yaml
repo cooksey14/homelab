@@ -109,7 +109,7 @@ indexer:
         - ALL
       drop: []
   command: ["/bin/bash"]
-  args: ["-c", "echo 'Starting OpenSearch directly...' && /usr/share/opensearch/bin/opensearch"]
+  args: ["-c", "echo 'Finding OpenSearch binary...' && find /usr -name '*opensearch*' -type f 2>/dev/null && echo 'Trying common paths...' && ls -la /usr/share/ && ls -la /usr/bin/ | grep -i opensearch"]
   env:
     - name: "OPENSEARCH_JAVA_OPTS"
       value: "-Xms1g -Xmx1g"
