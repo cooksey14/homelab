@@ -70,7 +70,7 @@ spec:
               
               # Keep the container running and monitor the API daemon
               while true; do
-                if ! pgrep -f "wazuh-apid" > /dev/null; then
+                if ! ls /var/ossec/var/run/wazuh-apid*.pid >/dev/null 2>&1; then
                   echo "API daemon stopped, restarting..."
                   /var/ossec/bin/wazuh-apid -d
                 fi
