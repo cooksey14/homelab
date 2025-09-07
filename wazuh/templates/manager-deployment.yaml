@@ -169,6 +169,9 @@ spec:
           emptyDir: {}
         - name: wazuh-etc
           emptyDir: {}
+        - name: wazuh-manager-config
+          configMap:
+            name: {{ include "wazuh.fullname" . }}-manager-config
         - name: wazuh-ossec-logs
           emptyDir: {}
       {{- with .Values.nodeSelector }}
