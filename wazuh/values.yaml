@@ -104,7 +104,7 @@ indexer:
     runAsNonRoot: false
     privileged: true
   command: ["/bin/bash"]
-  args: ["-c", "chmod +x /entrypoint.sh && /entrypoint.sh"]
+  args: ["-c", "ls -la / && if [ -f /entrypoint.sh ]; then chmod +x /entrypoint.sh && /entrypoint.sh; else echo 'No entrypoint.sh found, trying direct opensearch start'; /usr/share/opensearch/bin/opensearch; fi"]
   env:
     - name: "OPENSEARCH_JAVA_OPTS"
       value: "-Xms1g -Xmx1g"
