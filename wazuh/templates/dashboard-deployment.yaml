@@ -31,6 +31,14 @@ spec:
             {{- toYaml .Values.dashboard.securityContext | nindent 12 }}
           image: "{{ .Values.dashboard.image.repository }}:{{ .Values.dashboard.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.dashboard.image.pullPolicy }}
+          {{- if .Values.dashboard.command }}
+          command:
+            {{- toYaml .Values.dashboard.command | nindent 12 }}
+          {{- end }}
+          {{- if .Values.dashboard.args }}
+          args:
+            {{- toYaml .Values.dashboard.args | nindent 12 }}
+          {{- end }}
           env:
             {{- toYaml .Values.dashboard.env | nindent 12 }}
           ports:

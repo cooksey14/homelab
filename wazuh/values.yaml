@@ -132,6 +132,8 @@ dashboard:
     requests:
       cpu: 500m
       memory: 1Gi
+  command: ["/usr/share/wazuh-dashboard/bin/opensearch-dashboards"]
+  args: ["--host", "0.0.0.0", "--port", "5601"]
   env:
     - name: WAZUH_MANAGER
       value: "wazuh-manager"

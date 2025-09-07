@@ -91,9 +91,11 @@ spec:
             repository: kalingth/wazuh-dashboard
             pullPolicy: IfNotPresent
             tag: "4.8.2"
+          command: ["/usr/share/wazuh-dashboard/bin/opensearch-dashboards"]
+          args: ["--host", "0.0.0.0", "--port", "5601"]
           service:
             type: LoadBalancer
-            port: 443
+            port: 5601
           resources:
             limits:
               cpu: 1000m
