@@ -25,6 +25,34 @@ spec:
       serviceAccountName: {{ include "wazuh.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: wazuh-config-init
+          securityContext:
+            {{- toYaml .Values.manager.securityContext | nindent 12 }}
+          image: "{{ .Values.manager.image.repository }}:{{ .Values.manager.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.manager.image.pullPolicy }}
+          command: ["/bin/bash"]
+          args:
+            - -c
+            - |
+              echo "Initializing Wazuh configuration..."
+              # Copy configuration files from ConfigMap to writable location
+              cp /var/ossec/etc/ossec.conf /var/ossec/etc/ossec.conf.template
+              cp /var/ossec/etc/internal_options.conf /var/ossec/etc/internal_options.conf.template
+              cp /var/ossec/etc/shared/ar.conf /var/ossec/etc/shared/ar.conf.template
+              echo "Configuration files copied successfully"
+          volumeMounts:
+            - name: wazuh-manager-config
+              mountPath: /var/ossec/etc/ossec.conf
+              subPath: ossec.conf
+            - name: wazuh-manager-config
+              mountPath: /var/ossec/etc/internal_options.conf
+              subPath: internal_options.conf
+            - name: wazuh-manager-config
+              mountPath: /var/ossec/etc/shared/ar.conf
+              subPath: ar.conf
+            - name: wazuh-etc
+              mountPath: /var/ossec/etc
       containers:
         - name: wazuh-manager
           securityContext:
@@ -36,6 +64,11 @@ spec:
             - -c
             - |
               echo "Starting Wazuh Manager..."
+              
+              # Copy configuration files from templates to writable location
+              cp /var/ossec/etc/ossec.conf.template /var/ossec/etc/ossec.conf
+              cp /var/ossec/etc/internal_options.conf.template /var/ossec/etc/internal_options.conf
+              cp /var/ossec/etc/shared/ar.conf.template /var/ossec/etc/shared/ar.conf
               
               # Fix permissions for PID files
               chmod 777 /var/ossec/var/run/
@@ -116,15 +149,8 @@ spec:
               mountPath: /var/ossec/wodles
             - name: wazuh-var
               mountPath: /var/ossec/var
-            - name: wazuh-manager-config
-              mountPath: /var/ossec/etc/ossec.conf
-              subPath: ossec.conf
-            - name: wazuh-manager-config
-              mountPath: /var/ossec/etc/internal_options.conf
-              subPath: internal_options.conf
-            - name: wazuh-manager-config
-              mountPath: /var/ossec/etc/shared/ar.conf
-              subPath: ar.conf
+            - name: wazuh-etc
+              mountPath: /var/ossec/etc
             - name: wazuh-ossec-logs
               mountPath: /var/ossec/logs
       volumes:
@@ -141,9 +167,8 @@ spec:
           emptyDir: {}
         - name: wazuh-var
           emptyDir: {}
-        - name: wazuh-manager-config
-          configMap:
-            name: {{ include "wazuh.fullname" . }}-manager-config
+        - name: wazuh-etc
+          emptyDir: {}
         - name: wazuh-ossec-logs
           emptyDir: {}
       {{- with .Values.nodeSelector }}
