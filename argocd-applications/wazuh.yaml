@@ -52,10 +52,10 @@ spec:
               cpu: 500m
               memory: 1Gi
           securityContext:
-            runAsUser: 0
-            runAsGroup: 0
-            runAsNonRoot: false
-            privileged: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            privileged: false
             capabilities:
               add:
                 - SYS_CHROOT
@@ -66,6 +66,7 @@ spec:
                 - KILL
                 - SETGID
                 - SETUID
+                - SYS_ADMIN
           env:
             - name: "OPENSEARCH_JAVA_OPTS"
               value: "-Xms1g -Xmx1g"
