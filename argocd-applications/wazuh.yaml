@@ -58,14 +58,14 @@ spec:
             privileged: true
             capabilities:
               add:
-              - SYS_CHROOT
-              - CHOWN
-              - DAC_OVERRIDE
-              - FOWNER
-              - FSETID
-              - KILL
-              - SETGID
-              - SETUID
+                - SYS_CHROOT
+                - CHOWN
+                - DAC_OVERRIDE
+                - FOWNER
+                - FSETID
+                - KILL
+                - SETGID
+                - SETUID
           env:
             - name: "OPENSEARCH_JAVA_OPTS"
               value: "-Xms1g -Xmx1g"
