@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .Values.namespace }}
-  labels:
-    {{- include "wazuh.labels" . | nindent 4 }}
-    app.kubernetes.io/component: security-monitoring
-    app.kubernetes.io/part-of: security-stack
