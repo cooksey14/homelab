@@ -34,6 +34,34 @@ spec:
             runAsNonRoot: false
             privileged: true
         
+        # Indexer configuration
+        indexer:
+          replicaCount: 1
+          image:
+            repository: kalingth/wazuh-indexer
+            pullPolicy: IfNotPresent
+            tag: "4.8.2"
+          service:
+            type: ClusterIP
+            port: 9200
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 4Gi
+            requests:
+              cpu: 1000m
+              memory: 2Gi
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            runAsNonRoot: false
+            privileged: true
+          env:
+            - name: "OPENSEARCH_JAVA_OPTS"
+              value: "-Xms2g -Xmx2g"
+            - name: "OPENSEARCH_INITIAL_ADMIN_PASSWORD"
+              value: "admin"
+        
         # Dashboard configuration
         dashboard:
           replicaCount: 1

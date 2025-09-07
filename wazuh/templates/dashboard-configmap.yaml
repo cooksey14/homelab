@@ -10,10 +10,10 @@ data:
   wazuh.yml: |
     hosts:
       - default:
-          url: https://{{ include "wazuh.fullname" . }}-manager
-          port: 55000
-          username: {{ .Values.dashboard.config.username }}
-          password: {{ .Values.dashboard.config.password }}
+          url: https://{{ include "wazuh.fullname" . }}-indexer
+          port: 9200
+          username: admin
+          password: admin
           run_as: false
           timeout: 15
           ssl:
