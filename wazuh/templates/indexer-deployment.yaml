@@ -31,6 +31,14 @@ spec:
             {{- toYaml .Values.indexer.securityContext | nindent 12 }}
           image: "{{ .Values.indexer.image.repository }}:{{ .Values.indexer.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.indexer.image.pullPolicy }}
+          {{- if .Values.indexer.command }}
+          command:
+            {{- toYaml .Values.indexer.command | nindent 12 }}
+          {{- end }}
+          {{- if .Values.indexer.args }}
+          args:
+            {{- toYaml .Values.indexer.args | nindent 12 }}
+          {{- end }}
           env:
             {{- toYaml .Values.indexer.env | nindent 12 }}
           ports:
