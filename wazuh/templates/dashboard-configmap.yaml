@@ -19,3 +19,11 @@ data:
           ssl:
             verify_certificate: false
             verify_hostnames: false
+  opensearch_dashboards.yml: |
+    server.host: "0.0.0.0"
+    server.port: 443
+    opensearch.hosts: ["https://{{ include "wazuh.fullname" . }}-indexer:9200"]
+    opensearch.username: "admin"
+    opensearch.password: "admin"
+    opensearch.ssl.verificationMode: "none"
+    opensearch.requestHeadersWhitelist: ["authorization", "securitytenant"]
