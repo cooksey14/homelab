@@ -92,7 +92,7 @@ spec:
             pullPolicy: IfNotPresent
             tag: "4.8.2"
           command: ["/usr/share/wazuh-dashboard/bin/opensearch-dashboards"]
-          args: ["--host", "0.0.0.0", "--port", "5601"]
+          args: ["--host", "0.0.0.0", "--port", "5601", "--allow-root"]
           service:
             type: LoadBalancer
             port: 5601
