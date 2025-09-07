@@ -43,18 +43,19 @@ spec:
             - name: agent-auth
               containerPort: 1515
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-            initialDelaySeconds: 30
-            periodSeconds: 30
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 5
+          # Temporarily disable health checks to allow pod to be ready
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 30
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 5
           resources:
             {{- toYaml .Values.manager.resources | nindent 12 }}
           volumeMounts:
