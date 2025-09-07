@@ -56,6 +56,8 @@ spec:
             runAsGroup: 0
             runAsNonRoot: false
             privileged: true
+          command: ["/bin/bash"]
+          args: ["-c", "chmod +x /entrypoint.sh && /entrypoint.sh"]
           env:
             - name: "OPENSEARCH_JAVA_OPTS"
               value: "-Xms1g -Xmx1g"
