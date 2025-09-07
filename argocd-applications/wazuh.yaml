@@ -99,8 +99,7 @@ spec:
               value: "wazuh-manager"
             - name: WAZUH_MANAGER_PORT
               value: "55000"
-            - name: 
-            _DASHBOARDS_ALLOW_ROOT
+            - name: OPENSEARCH_DASHBOARDS_ALLOW_ROOT
               value: "true"
           config:
             username: "admin"
