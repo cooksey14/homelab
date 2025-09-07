@@ -42,17 +42,8 @@ spec:
             username: "admin"
             password: "admin"
         
-        # Agent configuration (DaemonSet for each node)
-        agent:
-          resources:
-            limits:
-              cpu: 200m
-              memory: 256Mi
-            requests:
-              cpu: 100m
-              memory: 128Mi
-          securityContext:
-            privileged: true
+        # Note: Wazuh agents are typically installed directly on host systems
+        # For Kubernetes, consider using host-based agents or alternative monitoring solutions
         
         # Ingress settings
         ingress:
