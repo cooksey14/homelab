@@ -13,6 +13,18 @@ spec:
       values: |
         # Override default values for production
         namespace: security
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: security
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - Prune=true
+    - PrunePropagationPolicy=foreground
+    - PruneLast=true
         
         # Manager configuration
         manager:
