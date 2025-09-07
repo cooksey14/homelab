@@ -103,6 +103,11 @@ dashboard:
       value: "wazuh-manager"
     - name: WAZUH_MANAGER_PORT
       value: "55000"
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0
+    runAsNonRoot: false
+    privileged: true
   config:
     username: "admin"
     password: "admin"
