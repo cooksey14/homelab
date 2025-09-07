@@ -124,7 +124,7 @@ dashboard:
     tag: "4.8.2"
   service:
     type: LoadBalancer
-    port: 443
+    port: 5601
   resources:
     limits:
       cpu: 1000m
