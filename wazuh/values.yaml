@@ -139,6 +139,8 @@ dashboard:
       value: "55000"
     - name: OPENSEARCH_DASHBOARDS_ALLOW_ROOT
       value: "true"
+    - name: OPENSEARCH_HOSTS
+      value: "https://wazuh-indexer:9200"
   securityContext:
     runAsUser: 0
     runAsGroup: 0

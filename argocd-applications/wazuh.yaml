@@ -25,6 +25,10 @@ spec:
     - Prune=true
     - PrunePropagationPolicy=foreground
     - PruneLast=true
+    helm:
+      values: |
+        # Override default values for production
+        namespace: security
         
         # Manager configuration
         manager:
@@ -109,6 +113,8 @@ spec:
               value: "55000"
             - name: OPENSEARCH_DASHBOARDS_ALLOW_ROOT
               value: "true"
+            - name: OPENSEARCH_HOSTS
+              value: "https://wazuh-indexer:9200"
           config:
             username: "admin"
             password: "admin"
