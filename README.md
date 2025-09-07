@@ -1,4 +1,4 @@
-# K3s Cluster GitOps Configuration
+# Colin's Kubernetes Cluster Homelab
 
 This repository contains the complete GitOps configuration for a K3s cluster running on Raspberry Pi nodes, managed entirely through ArgoCD.
 
@@ -17,6 +17,7 @@ This repository contains the complete GitOps configuration for a K3s cluster run
 | **ArgoCD** | argocd | https://argocd.cooklabs.net | ✅ Running |
 | **Mealie** | mealie | https://mealie.cooklabs.net | ✅ Running |
 | **Vaultwarden** | vaultwarden | https://vaultwarden.cooklabs.net | ✅ Running |
+| **Wazuh** | security | https://wazuh.cooklabs.net | ✅ Running |
 | **Grafana** | monitoring | https://grafana.cooklabs.net | ✅ Running |
 | **Prometheus** | monitoring | https://prometheus.cooklabs.net | ✅ Running |
 | **PostgreSQL** | monitoring | Internal | ✅ Running |
@@ -46,6 +47,7 @@ This cluster uses **ArgoCD** for complete GitOps automation:
 ### **Applications**
 - **Mealie**: Recipe management application
 - **Vaultwarden**: Self-hosted password manager
+- **Wazuh**: Security information and event management (SIEM)
 
 ## 🌐 **Network Configuration**
 
@@ -57,6 +59,7 @@ All applications use the `cooklabs.net` domain with A records pointing to the Lo
 | argocd.cooklabs.net | 192.168.86.101 | ArgoCD GitOps UI |
 | mealie.cooklabs.net | 192.168.86.101 | Recipe management |
 | vaultwarden.cooklabs.net | 192.168.86.101 | Password manager |
+| wazuh.cooklabs.net | 192.168.86.101 | Security monitoring |
 | grafana.cooklabs.net | 192.168.86.101 | Monitoring dashboards |
 | prometheus.cooklabs.net | 192.168.86.101 | Metrics collection |
 

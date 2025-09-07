@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wazuh.fullname" . }}-manager
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "wazuh.labels" . | nindent 4 }}
+    app.kubernetes.io/component: manager
+spec:
+  replicas: {{ .Values.manager.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "wazuh.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: manager
+  template:
+    metadata:
+      labels:
+        {{- include "wazuh.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: manager
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "wazuh.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: wazuh-manager
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.manager.image.repository }}:{{ .Values.manager.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.manager.image.pullPolicy }}
+          env:
+            {{- toYaml .Values.manager.env | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: 55000
+              protocol: TCP
+            - name: agent-comm
+              containerPort: 1514
+              protocol: TCP
+            - name: agent-auth
+              containerPort: 1515
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.manager.resources | nindent 12 }}
+          volumeMounts:
+            - name: wazuh-logs
+              mountPath: /var/log
+            - name: wazuh-queue
+              mountPath: /var/ossec/queue
+            - name: wazuh-integrations
+              mountPath: /var/ossec/integrations
+            - name: wazuh-agentless
+              mountPath: /var/ossec/agentless
+            - name: wazuh-wodles
+              mountPath: /var/ossec/wodles
+            - name: wazuh-var
+              mountPath: /var/ossec/var
+            - name: wazuh-etc
+              mountPath: /var/ossec/etc
+            - name: wazuh-logs
+              mountPath: /var/ossec/logs
+      volumes:
+        - name: wazuh-logs
+          hostPath:
+            path: /var/log
+        - name: wazuh-queue
+          emptyDir: {}
+        - name: wazuh-integrations
+          emptyDir: {}
+        - name: wazuh-agentless
+          emptyDir: {}
+        - name: wazuh-wodles
+          emptyDir: {}
+        - name: wazuh-var
+          emptyDir: {}
+        - name: wazuh-etc
+          emptyDir: {}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

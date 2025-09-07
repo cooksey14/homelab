@@ -1,0 +1,17 @@
+apiVersion: v2
+name: wazuh
+description: A Helm chart for Wazuh Security Platform
+type: application
+version: 0.1.0
+appVersion: "4.12.0"
+keywords:
+  - wazuh
+  - security
+  - siem
+  - monitoring
+home: https://wazuh.com
+sources:
+  - https://github.com/wazuh/wazuh
+maintainers:
+  - name: Colin Cook
+    email: cook.colin13@gmail.com

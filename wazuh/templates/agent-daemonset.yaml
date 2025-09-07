@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "wazuh.fullname" . }}-agent
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "wazuh.labels" . | nindent 4 }}
+    app.kubernetes.io/component: agent
+spec:
+  selector:
+    matchLabels:
+      {{- include "wazuh.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: agent
+  template:
+    metadata:
+      labels:
+        {{- include "wazuh.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: agent
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "wazuh.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: wazuh-agent
+          securityContext:
+            {{- toYaml .Values.agent.securityContext | nindent 12 }}
+          image: "{{ .Values.agent.image.repository }}:{{ .Values.agent.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.agent.image.pullPolicy }}
+          env:
+            {{- toYaml .Values.agent.env | nindent 12 }}
+          resources:
+            {{- toYaml .Values.agent.resources | nindent 12 }}
+          volumeMounts:
+            - name: host-proc
+              mountPath: /host/proc
+              readOnly: true
+            - name: host-sys
+              mountPath: /host/sys
+              readOnly: true
+            - name: host-dev
+              mountPath: /host/dev
+              readOnly: true
+            - name: host-var-log
+              mountPath: /host/var/log
+              readOnly: true
+            - name: host-etc
+              mountPath: /host/etc
+              readOnly: true
+            - name: host-root
+              mountPath: /host/root
+              readOnly: true
+            - name: host-run
+              mountPath: /host/run
+              readOnly: true
+            - name: host-lib-modules
+              mountPath: /host/lib/modules
+              readOnly: true
+            - name: host-boot
+              mountPath: /host/boot
+              readOnly: true
+            - name: wazuh-agent-var
+              mountPath: /var/ossec/var
+            - name: wazuh-agent-etc
+              mountPath: /var/ossec/etc
+            - name: wazuh-agent-logs
+              mountPath: /var/ossec/logs
+            - name: wazuh-agent-queue
+              mountPath: /var/ossec/queue
+            - name: wazuh-agent-integrations
+              mountPath: /var/ossec/integrations
+            - name: wazuh-agent-wodles
+              mountPath: /var/ossec/wodles
+            - name: wazuh-agent-agentless
+              mountPath: /var/ossec/agentless
+      volumes:
+        - name: host-proc
+          hostPath:
+            path: /proc
+        - name: host-sys
+          hostPath:
+            path: /sys
+        - name: host-dev
+          hostPath:
+            path: /dev
+        - name: host-var-log
+          hostPath:
+            path: /var/log
+        - name: host-etc
+          hostPath:
+            path: /etc
+        - name: host-root
+          hostPath:
+            path: /root
+        - name: host-run
+          hostPath:
+            path: /run
+        - name: host-lib-modules
+          hostPath:
+            path: /lib/modules
+        - name: host-boot
+          hostPath:
+            path: /boot
+        - name: wazuh-agent-var
+          emptyDir: {}
+        - name: wazuh-agent-etc
+          emptyDir: {}
+        - name: wazuh-agent-logs
+          emptyDir: {}
+        - name: wazuh-agent-queue
+          emptyDir: {}
+        - name: wazuh-agent-integrations
+          emptyDir: {}
+        - name: wazuh-agent-wodles
+          emptyDir: {}
+        - name: wazuh-agent-agentless
+          emptyDir: {}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

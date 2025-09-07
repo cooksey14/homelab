@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "wazuh.fullname" . }}-manager
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "wazuh.labels" . | nindent 4 }}
+    app.kubernetes.io/component: manager
+spec:
+  type: {{ .Values.manager.service.type }}
+  ports:
+    - port: {{ .Values.manager.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: 1514
+      targetPort: agent-comm
+      protocol: TCP
+      name: agent-comm
+    - port: 1515
+      targetPort: agent-auth
+      protocol: TCP
+      name: agent-auth
+  selector:
+    {{- include "wazuh.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: manager

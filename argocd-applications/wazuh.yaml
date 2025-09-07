@@ -1,0 +1,116 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: wazuh
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/cooksey14/homelab.git
+    path: wazuh
+    targetRevision: HEAD
+    helm:
+      values: |
+        # Override default values for production
+        namespace: security
+        
+        # Manager configuration
+        manager:
+          replicaCount: 1
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+            requests:
+              cpu: 500m
+              memory: 1Gi
+        
+        # Dashboard configuration
+        dashboard:
+          replicaCount: 1
+          service:
+            type: LoadBalancer
+            port: 443
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+            requests:
+              cpu: 500m
+              memory: 1Gi
+          config:
+            username: "admin"
+            password: "admin"
+        
+        # Agent configuration (DaemonSet for each node)
+        agent:
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            privileged: true
+        
+        # Ingress settings
+        ingress:
+          enabled: true
+          className: "traefik"
+          annotations:
+            cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
+            traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+            traefik.ingress.kubernetes.io/router.tls: "true"
+          hosts:
+            - host: wazuh.cooklabs.net
+              paths:
+                - path: /
+                  pathType: Prefix
+          tls:
+            - secretName: wazuh-tls
+              hosts:
+                - wazuh.cooklabs.net
+        
+        # Pod disruption budget
+        podDisruptionBudget:
+          enabled: true
+          minAvailable: 1
+        
+        # Security context
+        podSecurityContext:
+          fsGroup: 1000
+        
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: false
+          runAsNonRoot: true
+          runAsUser: 1000
+        
+        # Anti-affinity for high availability
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                    - wazuh
+                topologyKey: kubernetes.io/hostname
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: security
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - Prune=true
+    - PrunePropagationPolicy=foreground
+    - PruneLast=true
