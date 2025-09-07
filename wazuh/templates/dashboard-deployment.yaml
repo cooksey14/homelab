@@ -58,6 +58,9 @@ spec:
             - name: wazuh-dashboard-config
               mountPath: /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
               subPath: wazuh.yml
+            - name: wazuh-dashboard-config
+              mountPath: /usr/share/wazuh-dashboard/config/opensearch_dashboards.yml
+              subPath: opensearch_dashboards.yml
             - name: wazuh-dashboard-data
               mountPath: /usr/share/wazuh-dashboard/data
       volumes:
