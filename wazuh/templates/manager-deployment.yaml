@@ -31,6 +31,42 @@ spec:
             {{- toYaml .Values.manager.securityContext | nindent 12 }}
           image: "{{ .Values.manager.image.repository }}:{{ .Values.manager.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.manager.image.pullPolicy }}
+          command: ["/bin/bash"]
+          args:
+            - -c
+            - |
+              echo "Starting Wazuh Manager..."
+              
+              # Fix permissions for PID files
+              chmod 777 /var/ossec/var/run/
+              
+              # Start core Wazuh daemons in background
+              /var/ossec/bin/wazuh-db -d
+              sleep 2
+              /var/ossec/bin/wazuh-analysisd -d
+              sleep 2
+              /var/ossec/bin/wazuh-execd -d
+              sleep 2
+              /var/ossec/bin/wazuh-remoted -d
+              sleep 2
+              /var/ossec/bin/wazuh-modulesd -d
+              sleep 2
+              
+              # Start API daemon
+              /var/ossec/bin/wazuh-apid -d
+              sleep 5
+              
+              echo "All Wazuh daemons started successfully"
+              echo "Wazuh Manager is ready"
+              
+              # Keep the container running and monitor the API daemon
+              while true; do
+                if ! pgrep -f "wazuh-apid" > /dev/null; then
+                  echo "API daemon stopped, restarting..."
+                  /var/ossec/bin/wazuh-apid -d
+                fi
+                sleep 30
+              done
           env:
             {{- toYaml .Values.manager.env | nindent 12 }}
           ports:
