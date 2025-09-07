@@ -8,7 +8,7 @@ replicaCount: 1
 image:
   repository: kalingth/wazuh-manager
   pullPolicy: IfNotPresent
-  tag: "4.12.0"
+  tag: "4.8.2"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -59,7 +59,7 @@ manager:
   image:
     repository: kalingth/wazuh-manager
     pullPolicy: IfNotPresent
-    tag: "4.12.0"
+    tag: "4.8.2"
   service:
     type: ClusterIP
     port: 55000
@@ -70,6 +70,11 @@ manager:
     requests:
       cpu: 500m
       memory: 1Gi
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0
+    runAsNonRoot: false
+    privileged: true
   env:
     - name: WAZUH_MANAGER
       value: "wazuh-manager"
@@ -82,7 +87,7 @@ dashboard:
   image:
     repository: kalingth/wazuh-dashboard
     pullPolicy: IfNotPresent
-    tag: "4.12.0"
+    tag: "4.8.2"
   service:
     type: LoadBalancer
     port: 443
@@ -107,7 +112,7 @@ agent:
   image:
     repository: kalingth/wazuh-agent
     pullPolicy: IfNotPresent
-    tag: "4.12.0"
+    tag: "4.8.2"
   resources:
     limits:
       cpu: 200m

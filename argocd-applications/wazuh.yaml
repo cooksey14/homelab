@@ -20,7 +20,7 @@ spec:
           image:
             repository: kalingth/wazuh-manager
             pullPolicy: IfNotPresent
-            tag: "4.12.0"
+            tag: "4.8.2"
           resources:
             limits:
               cpu: 1000m
@@ -28,6 +28,11 @@ spec:
             requests:
               cpu: 500m
               memory: 1Gi
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            runAsNonRoot: false
+            privileged: true
         
         # Dashboard configuration
         dashboard:
@@ -35,7 +40,7 @@ spec:
           image:
             repository: kalingth/wazuh-dashboard
             pullPolicy: IfNotPresent
-            tag: "4.12.0"
+            tag: "4.8.2"
           service:
             type: LoadBalancer
             port: 443
@@ -55,7 +60,7 @@ spec:
           image:
             repository: kalingth/wazuh-agent
             pullPolicy: IfNotPresent
-            tag: "4.12.0"
+            tag: "4.8.2"
           resources:
             limits:
               cpu: 200m
