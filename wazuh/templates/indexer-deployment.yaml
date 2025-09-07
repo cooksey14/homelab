@@ -52,15 +52,11 @@ spec:
             {{- toYaml .Values.indexer.resources | nindent 12 }}
           volumeMounts:
             - name: wazuh-indexer-data
-              mountPath: /usr/share/opensearch/data
-            - name: wazuh-indexer-config
-              mountPath: /usr/share/opensearch/config
+              mountPath: /var/lib/wazuh-indexer
             - name: wazuh-indexer-logs
-              mountPath: /usr/share/opensearch/logs
+              mountPath: /var/log/wazuh-indexer
       volumes:
         - name: wazuh-indexer-data
-          emptyDir: {}
-        - name: wazuh-indexer-config
           emptyDir: {}
         - name: wazuh-indexer-logs
           emptyDir: {}

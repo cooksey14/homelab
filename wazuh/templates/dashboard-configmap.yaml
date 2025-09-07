@@ -27,6 +27,8 @@ data:
     opensearch.requestHeadersWhitelist: [ authorization,securitytenant ]
     opensearch_security.multitenancy.enabled: false
     opensearch_security.readonly_mode.roles: ["kibana_read_only"]
+    opensearch.username: admin
+    opensearch.password: admin
     server.ssl.enabled: true
     server.ssl.key: "/usr/share/wazuh-dashboard/config/certs/dashboard-key.pem"
     server.ssl.certificate: "/usr/share/wazuh-dashboard/config/certs/dashboard.pem"
