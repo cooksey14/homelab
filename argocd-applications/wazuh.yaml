@@ -17,6 +17,10 @@ spec:
         # Manager configuration
         manager:
           replicaCount: 1
+          image:
+            repository: kalingth/wazuh-manager
+            pullPolicy: IfNotPresent
+            tag: "4.12.0"
           resources:
             limits:
               cpu: 1000m
@@ -28,6 +32,10 @@ spec:
         # Dashboard configuration
         dashboard:
           replicaCount: 1
+          image:
+            repository: kalingth/wazuh-dashboard
+            pullPolicy: IfNotPresent
+            tag: "4.12.0"
           service:
             type: LoadBalancer
             port: 443
@@ -42,8 +50,21 @@ spec:
             username: "admin"
             password: "admin"
         
-        # Note: Wazuh agents are typically installed directly on host systems
-        # For Kubernetes, consider using host-based agents or alternative monitoring solutions
+        # Agent configuration (DaemonSet for each node) - Using community ARM64 image
+        agent:
+          image:
+            repository: kalingth/wazuh-agent
+            pullPolicy: IfNotPresent
+            tag: "4.12.0"
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            privileged: true
         
         # Ingress settings
         ingress:

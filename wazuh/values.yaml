@@ -6,7 +6,7 @@ namespace: security
 replicaCount: 1
 
 image:
-  repository: wazuh/wazuh-manager
+  repository: kalingth/wazuh-manager
   pullPolicy: IfNotPresent
   tag: "4.12.0"
 
@@ -57,7 +57,7 @@ podDisruptionBudget:
 manager:
   replicaCount: 1
   image:
-    repository: wazuh/wazuh-manager
+    repository: kalingth/wazuh-manager
     pullPolicy: IfNotPresent
     tag: "4.12.0"
   service:
@@ -80,7 +80,7 @@ manager:
 dashboard:
   replicaCount: 1
   image:
-    repository: wazuh/wazuh-dashboard
+    repository: kalingth/wazuh-dashboard
     pullPolicy: IfNotPresent
     tag: "4.12.0"
   service:
@@ -102,8 +102,54 @@ dashboard:
     username: "admin"
     password: "admin"
 
-# Note: Wazuh agents are typically installed directly on host systems
-# For Kubernetes, consider using host-based agents or alternative monitoring solutions
+# Wazuh Agent configuration (DaemonSet) - Using community ARM64 image
+agent:
+  image:
+    repository: kalingth/wazuh-agent
+    pullPolicy: IfNotPresent
+    tag: "4.12.0"
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  securityContext:
+    privileged: true
+    capabilities:
+      add:
+      - SYS_PTRACE
+      - AUDIT_CONTROL
+      - AUDIT_READ
+      - AUDIT_WRITE
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - FSETID
+      - KILL
+      - SETGID
+      - SETUID
+      - SYS_ADMIN
+      - SYS_CHROOT
+      - SYS_MODULE
+      - SYS_NICE
+      - SYS_PACCT
+      - SYS_RESOURCE
+      - SYS_TIME
+      - SYS_TTY_CONFIG
+      - MAC_ADMIN
+      - MAC_OVERRIDE
+      - MKNOD
+      - NET_ADMIN
+      - NET_RAW
+      - SYSLOG
+      - WAKE_ALARM
+      - BLOCK_SUSPEND
+      - LEASE
+      - SYS_BOOT
+      - SYS_RAWIO
+  env: []
 
 # Ingress configuration
 ingress:
