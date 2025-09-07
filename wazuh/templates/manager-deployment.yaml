@@ -107,8 +107,9 @@ spec:
               mountPath: /var/ossec/wodles
             - name: wazuh-var
               mountPath: /var/ossec/var
-            - name: wazuh-etc
-              mountPath: /var/ossec/etc
+            - name: wazuh-manager-config
+              mountPath: /var/ossec/etc/ossec.conf
+              subPath: ossec.conf
             - name: wazuh-ossec-logs
               mountPath: /var/ossec/logs
       volumes:
@@ -125,8 +126,9 @@ spec:
           emptyDir: {}
         - name: wazuh-var
           emptyDir: {}
-        - name: wazuh-etc
-          emptyDir: {}
+        - name: wazuh-manager-config
+          configMap:
+            name: {{ include "wazuh.fullname" . }}-manager-config
         - name: wazuh-ossec-logs
           emptyDir: {}
       {{- with .Values.nodeSelector }}
