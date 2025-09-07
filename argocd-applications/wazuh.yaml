@@ -64,10 +64,9 @@ spec:
               cpu: 500m
               memory: 1Gi
           securityContext:
-            runAsUser: 0
-            runAsGroup: 0
-            runAsNonRoot: false
-            privileged: true
+            runAsUser: 9255
+            runAsGroup: 9255
+            runAsNonRoot: true
             allowPrivilegeEscalation: true
             capabilities:
               add:
