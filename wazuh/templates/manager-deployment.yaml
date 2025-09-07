@@ -25,34 +25,6 @@ spec:
       serviceAccountName: {{ include "wazuh.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      initContainers:
-        - name: wazuh-config-init
-          securityContext:
-            {{- toYaml .Values.manager.securityContext | nindent 12 }}
-          image: "{{ .Values.manager.image.repository }}:{{ .Values.manager.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.manager.image.pullPolicy }}
-          command: ["/bin/bash"]
-          args:
-            - -c
-            - |
-              echo "Initializing Wazuh configuration..."
-              # Copy configuration files from ConfigMap to writable location
-              cp /var/ossec/etc/ossec.conf /var/ossec/etc/ossec.conf.template
-              cp /var/ossec/etc/internal_options.conf /var/ossec/etc/internal_options.conf.template
-              cp /var/ossec/etc/shared/ar.conf /var/ossec/etc/shared/ar.conf.template
-              echo "Configuration files copied successfully"
-          volumeMounts:
-            - name: wazuh-manager-config
-              mountPath: /var/ossec/etc/ossec.conf
-              subPath: ossec.conf
-            - name: wazuh-manager-config
-              mountPath: /var/ossec/etc/internal_options.conf
-              subPath: internal_options.conf
-            - name: wazuh-manager-config
-              mountPath: /var/ossec/etc/shared/ar.conf
-              subPath: ar.conf
-            - name: wazuh-etc
-              mountPath: /var/ossec/etc
       containers:
         - name: wazuh-manager
           securityContext:
@@ -63,52 +35,11 @@ spec:
           args:
             - -c
             - |
-              echo "Starting Wazuh Manager..."
+              echo "Starting Wazuh Manager with default configuration..."
               
-              # Copy configuration files from templates to writable location
-              cp /var/ossec/etc/ossec.conf.template /var/ossec/etc/ossec.conf
-              cp /var/ossec/etc/internal_options.conf.template /var/ossec/etc/internal_options.conf
-              cp /var/ossec/etc/shared/ar.conf.template /var/ossec/etc/shared/ar.conf
-              
-              # Fix permissions for PID files
-              chmod 777 /var/ossec/var/run/
-              
-              # Create SSL certificates for API daemon
-              mkdir -p /var/ossec/api/configuration/ssl
-              if [ ! -f /var/ossec/api/configuration/ssl/server.key ]; then
-                echo "Creating SSL certificates for API daemon..."
-                openssl req -x509 -newkey rsa:4096 -keyout /var/ossec/api/configuration/ssl/server.key -out /var/ossec/api/configuration/ssl/server.crt -days 365 -nodes -subj "/C=US/ST=CA/L=San Francisco/O=Wazuh/CN=wazuh-manager"
-                chmod 600 /var/ossec/api/configuration/ssl/server.key
-                chmod 644 /var/ossec/api/configuration/ssl/server.crt
-              fi
-              
-              # Start core Wazuh daemons in background
-              /var/ossec/bin/wazuh-db -d
-              sleep 2
-              /var/ossec/bin/wazuh-analysisd -d
-              sleep 2
-              /var/ossec/bin/wazuh-execd -d
-              sleep 2
-              /var/ossec/bin/wazuh-remoted -d
-              sleep 2
-              /var/ossec/bin/wazuh-modulesd -d
-              sleep 2
-              
-              # Start API daemon
-              /var/ossec/bin/wazuh-apid -d
-              sleep 5
-              
-              echo "All Wazuh daemons started successfully"
-              echo "Wazuh Manager is ready"
-              
-              # Keep the container running and monitor the API daemon
-              while true; do
-                if ! ls /var/ossec/var/run/wazuh-apid*.pid >/dev/null 2>&1; then
-                  echo "API daemon stopped, restarting..."
-                  /var/ossec/bin/wazuh-apid -d
-                fi
-                sleep 30
-              done
+              # Let Wazuh use its default startup process
+              # The container will handle configuration and daemon startup
+              exec /usr/local/bin/docker-entrypoint.sh
           env:
             {{- toYaml .Values.manager.env | nindent 12 }}
           ports:
@@ -149,8 +80,6 @@ spec:
               mountPath: /var/ossec/wodles
             - name: wazuh-var
               mountPath: /var/ossec/var
-            - name: wazuh-etc
-              mountPath: /var/ossec/etc
             - name: wazuh-ossec-logs
               mountPath: /var/ossec/logs
       volumes:
@@ -167,11 +96,6 @@ spec:
           emptyDir: {}
         - name: wazuh-var
           emptyDir: {}
-        - name: wazuh-etc
-          emptyDir: {}
-        - name: wazuh-manager-config
-          configMap:
-            name: {{ include "wazuh.fullname" . }}-manager-config
         - name: wazuh-ossec-logs
           emptyDir: {}
       {{- with .Values.nodeSelector }}
