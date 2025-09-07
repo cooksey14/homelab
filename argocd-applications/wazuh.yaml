@@ -56,6 +56,13 @@ spec:
             runAsGroup: 0
             runAsNonRoot: false
             privileged: true
+          env:
+            - name: WAZUH_MANAGER
+              value: "wazuh-manager"
+            - name: WAZUH_MANAGER_PORT
+              value: "55000"
+            - name: OPENSEARCH_DASHBOARDS_ALLOW_ROOT
+              value: "true"
           config:
             username: "admin"
             password: "admin"

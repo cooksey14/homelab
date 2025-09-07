@@ -103,6 +103,8 @@ dashboard:
       value: "wazuh-manager"
     - name: WAZUH_MANAGER_PORT
       value: "55000"
+    - name: OPENSEARCH_DASHBOARDS_ALLOW_ROOT
+      value: "true"
   securityContext:
     runAsUser: 0
     runAsGroup: 0

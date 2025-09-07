@@ -55,7 +55,7 @@ spec:
             {{- toYaml .Values.dashboard.resources | nindent 12 }}
           volumeMounts:
             - name: wazuh-dashboard-config
-              mountPath: /usr/share/wazuh-dashboard/config/wazuh.yml
+              mountPath: /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
               subPath: wazuh.yml
             - name: wazuh-dashboard-data
               mountPath: /usr/share/wazuh-dashboard/data

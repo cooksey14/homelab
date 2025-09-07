@@ -72,7 +72,7 @@ spec:
               mountPath: /var/ossec/var
             - name: wazuh-etc
               mountPath: /var/ossec/etc
-            - name: wazuh-logs
+            - name: wazuh-ossec-logs
               mountPath: /var/ossec/logs
       volumes:
         - name: wazuh-logs
@@ -89,6 +89,8 @@ spec:
         - name: wazuh-var
           emptyDir: {}
         - name: wazuh-etc
+          emptyDir: {}
+        - name: wazuh-ossec-logs
           emptyDir: {}
       {{- with .Values.nodeSelector }}
       nodeSelector:
