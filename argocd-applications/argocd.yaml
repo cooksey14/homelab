@@ -14,23 +14,29 @@ spec:
         # ArgoCD server configuration
         server:
           service:
-            type: LoadBalancer
+            type: ClusterIP
           ingress:
             enabled: true
-            ingressClassName: "traefik"
+            ingressClassName: traefik
             annotations:
-              cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
-              traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+              cert-manager.io/cluster-issuer: letsencrypt-prod-dns
+              traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
               traefik.ingress.kubernetes.io/router.tls: "true"
             hosts:
               - argocd.cooklabs.net
             tls:
-              - secretName: argocd-tls
+              - secretName: argocd-server-tls
                 hosts:
                   - argocd.cooklabs.net
+          insecure: true
         
-        # Repository configuration
+        # Configuration
         configs:
+          params:
+            server.insecure: "true"
+          cm:
+            url: https://argocd.cooklabs.net
+            server.insecure: "true"
           repositories:
             homelab:
               type: git
