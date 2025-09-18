@@ -3,13 +3,12 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/cooksey14/homelab-command-center
+  repository: cookcolin13/homelab-command-center
   pullPolicy: IfNotPresent
-  tag: "7812056d165a00acfc9a93b36f788cf2adfb06c9"
+  tag: "latest"
 
 # Image pull secrets for private registry
-imagePullSecrets:
-  - name: ghcr-secret
+imagePullSecrets: []
 
 nameOverride: ""
 fullnameOverride: ""
