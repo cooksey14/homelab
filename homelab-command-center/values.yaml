@@ -123,7 +123,7 @@ redis:
 
 # Database migration configuration
 migration:
-  enabled: true
+  enabled: false
   version: "latest"  # Change this to trigger new migration runs
   runAsInitContainer: false  # Set to true to run migrations as init container
   resources:
