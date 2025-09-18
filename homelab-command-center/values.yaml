@@ -5,7 +5,7 @@ replicaCount: 1
 image:
   repository: cookcolin13/homelab-command-center
   pullPolicy: IfNotPresent
-  tag: "67b1289cc3b7ee934df5d2f44363a7dbcb3dd4f2"
+  tag: "8f62eaa886ad45eb463491e0b3b165c69b2a35f7"
 
 # Image pull secrets for private registry
 imagePullSecrets: []
