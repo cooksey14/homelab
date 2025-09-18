@@ -16,3 +16,4 @@ spec:
     matchLabels:
       {{- include "vaultwarden.selectorLabels" . | nindent 6 }}
 {{- end }}
+

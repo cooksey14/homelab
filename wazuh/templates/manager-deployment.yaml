@@ -31,15 +31,7 @@ spec:
             {{- toYaml .Values.manager.securityContext | nindent 12 }}
           image: "{{ .Values.manager.image.repository }}:{{ .Values.manager.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.manager.image.pullPolicy }}
-          command: ["/bin/bash"]
-          args:
-            - -c
-            - |
-              echo "Starting Wazuh Manager with default configuration..."
-              
-              # Let Wazuh use its default startup process
-              # The container will handle configuration and daemon startup
-              exec /usr/local/bin/docker-entrypoint.sh
+          # Let the kalingth/wazuh-manager image use its default s6 process manager
           env:
             {{- toYaml .Values.manager.env | nindent 12 }}
           ports:

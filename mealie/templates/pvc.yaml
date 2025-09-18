@@ -1,7 +1,4 @@
 {{- if .Values.persistence.enabled }}
-{{- if .Values.persistence.existingClaim }}
-# Using existing PVC: {{ .Values.persistence.existingClaim }}
-{{- else }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

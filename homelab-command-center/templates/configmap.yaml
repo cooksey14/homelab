@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "homelab-command-center.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "homelab-command-center.labels" . | nindent 4 }}
+data:
+  DEBUG: {{ .Values.app.config.debug | quote }}
+  CHECK_INTERVAL: {{ .Values.app.config.checkInterval | quote }}
+  ALERT_COOLDOWN: {{ .Values.app.config.alertCooldown | quote }}
+  IN_CLUSTER: "true"
+  LOG_LEVEL: "INFO"

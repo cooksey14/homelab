@@ -1,0 +1,217 @@
+name: Database Migration Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'k3s/homelab-command-center/migrations/**'
+      - 'k3s/homelab-command-center/src/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to migrate'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
+
+env:
+  KUBECONFIG: /tmp/kubeconfig
+  NAMESPACE: homelab-command-center
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      has-migrations: ${{ steps.changes.outputs.migrations }}
+      has-app-changes: ${{ steps.changes.outputs.app }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Detect changes
+      uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          migrations:
+            - 'k3s/homelab-command-center/migrations/**'
+          app:
+            - 'k3s/homelab-command-center/src/**'
+            - 'k3s/homelab-command-center/templates/**'
+            - 'k3s/homelab-command-center/values.yaml'
+
+  run-migrations:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has-migrations == 'true'
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+
+    - name: Configure kubectl
+      run: |
+        # Get kubeconfig from secrets (you'll need to set this up)
+        echo "${{ secrets.KUBECONFIG }}" | base64 -d > $KUBECONFIG
+        
+        # Test connection
+        kubectl get nodes
+
+    - name: Check database connection
+      run: |
+        cd k3s/homelab-command-center
+        python migrate.py check-connection
+
+    - name: Get migration status
+      run: |
+        cd k3s/homelab-command-center
+        python migrate.py status
+
+    - name: Create migration job
+      run: |
+        cat <<EOF | kubectl apply -f -
+        apiVersion: batch/v1
+        kind: Job
+        metadata:
+          name: homelab-command-center-migration-$(date +%s)
+          namespace: $NAMESPACE
+          labels:
+            app: homelab-command-center
+            component: migration
+        spec:
+          template:
+            spec:
+              restartPolicy: Never
+              serviceAccountName: homelab-command-center-migration
+              containers:
+              - name: migration
+                image: ghcr.io/cooksey14/homelab-command-center:latest
+                command: ["python", "migrate.py", "migrate"]
+                env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: homelab-command-center-db
+                      key: url
+                - name: REDIS_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: homelab-command-center-redis
+                      key: url
+                resources:
+                  requests:
+                    memory: "128Mi"
+                    cpu: "100m"
+                  limits:
+                    memory: "256Mi"
+                    cpu: "200m"
+              imagePullSecrets:
+              - name: ghcr-secret
+        EOF
+
+    - name: Wait for migration completion
+      run: |
+        # Get the latest migration job
+        JOB_NAME=$(kubectl get jobs -n $NAMESPACE -l component=migration --sort-by=.metadata.creationTimestamp -o jsonpath='{.items[-1].metadata.name}')
+        
+        echo "Waiting for migration job: $JOB_NAME"
+        kubectl wait --for=condition=complete job/$JOB_NAME -n $NAMESPACE --timeout=300s
+        
+        # Check if job succeeded
+        if kubectl get job $JOB_NAME -n $NAMESPACE -o jsonpath='{.status.conditions[0].type}' | grep -q Complete; then
+          echo "✅ Migration completed successfully"
+        else
+          echo "❌ Migration failed"
+          kubectl logs job/$JOB_NAME -n $NAMESPACE
+          exit 1
+        fi
+
+    - name: Cleanup migration job
+      if: always()
+      run: |
+        # Clean up completed migration jobs older than 1 hour
+        kubectl get jobs -n $NAMESPACE -l component=migration -o json | \
+        jq -r '.items[] | select(.status.completionTime != null) | select((.status.completionTime | fromdateiso8601) < (now - 3600)) | .metadata.name' | \
+        xargs -r kubectl delete job -n $NAMESPACE
+
+  deploy-application:
+    needs: [detect-changes, run-migrations]
+    if: always() && (needs.detect-changes.outputs.has-app-changes == 'true' || needs.run-migrations.result == 'success')
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+
+    - name: Configure kubectl
+      run: |
+        echo "${{ secrets.KUBECONFIG }}" | base64 -d > $KUBECONFIG
+        kubectl get nodes
+
+    - name: Trigger ArgoCD sync
+      run: |
+        # Trigger ArgoCD application sync
+        kubectl patch application homelab-command-center -n argocd --type merge -p '{"operation":{"sync":{"syncStrategy":{"hook":{"force":true}}}}}'
+        
+        # Wait for sync to complete
+        kubectl wait --for=condition=Synced application/homelab-command-center -n argocd --timeout=600s
+
+    - name: Verify deployment
+      run: |
+        # Wait for deployment to be ready
+        kubectl wait --for=condition=available deployment/homelab-command-center -n $NAMESPACE --timeout=300s
+        
+        # Check pod status
+        kubectl get pods -n $NAMESPACE -l app.kubernetes.io/name=homelab-command-center
+        
+        # Test health endpoint
+        kubectl port-forward -n $NAMESPACE svc/homelab-command-center 8080:8000 &
+        sleep 10
+        curl -f http://localhost:8080/health || exit 1
+        kill %1
+
+  notify:
+    needs: [run-migrations, deploy-application]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Notify success
+      if: needs.run-migrations.result == 'success' && needs.deploy-application.result == 'success'
+      run: |
+        echo "✅ Migration and deployment completed successfully" >> $GITHUB_STEP_SUMMARY
+        echo "🌐 Application: https://homelab.cooklabs.net" >> $GITHUB_STEP_SUMMARY
+        echo "📊 ArgoCD: https://argocd.cooklabs.net" >> $GITHUB_STEP_SUMMARY
+
+    - name: Notify failure
+      if: needs.run-migrations.result == 'failure' || needs.deploy-application.result == 'failure'
+      run: |
+        echo "❌ Migration or deployment failed" >> $GITHUB_STEP_SUMMARY
+        echo "Please check the logs and retry" >> $GITHUB_STEP_SUMMARY

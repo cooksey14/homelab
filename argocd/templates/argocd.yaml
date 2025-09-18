@@ -47,3 +47,4 @@ spec:
     {{- toYaml .Values.argocd.server.ingress.hosts | nindent 4 }}
 {{- end }}
 {{- end }}
+

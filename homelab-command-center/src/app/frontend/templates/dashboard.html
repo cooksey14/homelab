@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HomeLab Command Center</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .status-healthy { color: #28a745; }
+        .status-warning { color: #ffc107; }
+        .status-unhealthy { color: #dc3545; }
+        .metric-card { transition: transform 0.2s; }
+        .metric-card:hover { transform: translateY(-2px); }
+        .refresh-btn { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                <i class="bi bi-cpu"></i> HomeLab Command Center
+            </span>
+            <span class="navbar-text">
+                <i class="bi bi-circle-fill text-success" id="status-indicator"></i>
+                <span id="last-updated">Loading...</span>
+            </span>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Cluster Overview -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2><i class="bi bi-diagram-3"></i> Cluster Overview</h2>
+            </div>
+        </div>
+
+        <!-- Metrics Cards -->
+        <div class="row mb-4" id="metrics-cards">
+            <div class="col-md-3 mb-3">
+                <div class="card metric-card border-primary">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><i class="bi bi-hdd-network"></i> Nodes</h5>
+                        <h3 class="text-primary" id="total-nodes">-</h3>
+                        <small class="text-muted" id="ready-nodes">Ready: -</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card metric-card border-info">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><i class="bi bi-box"></i> Pods</h5>
+                        <h3 class="text-info" id="total-pods">-</h3>
+                        <small class="text-muted" id="running-pods">Running: -</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card metric-card border-success">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><i class="bi bi-gear"></i> Services</h5>
+                        <h3 class="text-success" id="total-services">-</h3>
+                        <small class="text-muted">Active</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card metric-card border-warning">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><i class="bi bi-heart-pulse"></i> Health</h5>
+                        <h3 class="text-warning" id="cluster-health">-</h3>
+                        <small class="text-muted" id="health-status">Checking...</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resource Usage -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-cpu"></i> CPU Usage</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="progress mb-2">
+                            <div class="progress-bar" id="cpu-progress" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted" id="cpu-text">CPU Usage: 0%</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-memory"></i> Memory Usage</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="progress mb-2">
+                            <div class="progress-bar" id="memory-progress" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted" id="memory-text">Memory Usage: 0%</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Views -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-hdd-network"></i> Nodes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="nodes-list">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-box"></i> Recent Pods</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="pods-list">
+                            <div class="text-center">
+                                <div class="spinner-border text-info" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-gear"></i> Services</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="services-list">
+                            <div class="text-center">
+                                <div class="spinner-border text-success" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refresh Button -->
+    <button class="btn btn-primary refresh-btn" onclick="refreshData()">
+        <i class="bi bi-arrow-clockwise"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let refreshInterval;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshData();
+            // Auto-refresh every 30 seconds
+            refreshInterval = setInterval(refreshData, 30000);
+        });
+
+        async function refreshData() {
+            try {
+                await Promise.all([
+                    loadClusterStats(),
+                    loadClusterHealth(),
+                    loadNodes(),
+                    loadPods(),
+                    loadServices()
+                ]);
+                updateLastUpdated();
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+                showError('Failed to refresh data');
+            }
+        }
+
+        async function loadClusterStats() {
+            try {
+                const response = await fetch('/api/v1/cluster/stats');
+                const stats = await response.json();
+                
+                document.getElementById('total-nodes').textContent = stats.total_nodes;
+                document.getElementById('ready-nodes').textContent = `Ready: ${stats.ready_nodes}`;
+                document.getElementById('total-pods').textContent = stats.total_pods;
+                document.getElementById('running-pods').textContent = `Running: ${stats.running_pods}`;
+                document.getElementById('total-services').textContent = stats.total_services;
+                
+                // Update resource usage
+                if (stats.cpu_usage_percent !== null) {
+                    updateProgressBar('cpu-progress', 'cpu-text', stats.cpu_usage_percent, 'CPU Usage');
+                }
+                if (stats.memory_usage_percent !== null) {
+                    updateProgressBar('memory-progress', 'memory-text', stats.memory_usage_percent, 'Memory Usage');
+                }
+            } catch (error) {
+                console.error('Error loading cluster stats:', error);
+            }
+        }
+
+        async function loadClusterHealth() {
+            try {
+                const response = await fetch('/api/v1/cluster/health');
+                const health = await response.json();
+                
+                const statusElement = document.getElementById('cluster-health');
+                const statusTextElement = document.getElementById('health-status');
+                const indicatorElement = document.getElementById('status-indicator');
+                
+                statusElement.textContent = health.overall_status;
+                statusTextElement.textContent = `${health.healthy} healthy, ${health.warning} warnings, ${health.unhealthy} unhealthy`;
+                
+                // Update status indicator
+                indicatorElement.className = 'bi bi-circle-fill';
+                if (health.overall_status === 'healthy') {
+                    indicatorElement.classList.add('text-success');
+                } else if (health.overall_status === 'warning') {
+                    indicatorElement.classList.add('text-warning');
+                } else {
+                    indicatorElement.classList.add('text-danger');
+                }
+            } catch (error) {
+                console.error('Error loading cluster health:', error);
+            }
+        }
+
+        async function loadNodes() {
+            try {
+                const response = await fetch('/api/v1/nodes');
+                const data = await response.json();
+                
+                const nodesList = document.getElementById('nodes-list');
+                nodesList.innerHTML = '';
+                
+                data.nodes.slice(0, 5).forEach(node => {
+                    const nodeElement = document.createElement('div');
+                    nodeElement.className = 'mb-2 p-2 border rounded';
+                    nodeElement.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><strong>${node.name}</strong></span>
+                            <span class="badge ${getStatusBadgeClass(node.status)}">${node.status}</span>
+                        </div>
+                        <small class="text-muted">${node.role} • ${node.version || 'Unknown'}</small>
+                    `;
+                    nodesList.appendChild(nodeElement);
+                });
+            } catch (error) {
+                console.error('Error loading nodes:', error);
+            }
+        }
+
+        async function loadPods() {
+            try {
+                const response = await fetch('/api/v1/pods');
+                const data = await response.json();
+                
+                const podsList = document.getElementById('pods-list');
+                podsList.innerHTML = '';
+                
+                data.pods.slice(0, 5).forEach(pod => {
+                    const podElement = document.createElement('div');
+                    podElement.className = 'mb-2 p-2 border rounded';
+                    podElement.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><strong>${pod.name}</strong></span>
+                            <span class="badge ${getStatusBadgeClass(pod.phase)}">${pod.phase}</span>
+                        </div>
+                        <small class="text-muted">${pod.namespace} • Restarts: ${pod.restart_count}</small>
+                    `;
+                    podsList.appendChild(podElement);
+                });
+            } catch (error) {
+                console.error('Error loading pods:', error);
+            }
+        }
+
+        async function loadServices() {
+            try {
+                const response = await fetch('/api/v1/services');
+                const data = await response.json();
+                
+                const servicesList = document.getElementById('services-list');
+                servicesList.innerHTML = '';
+                
+                data.services.slice(0, 5).forEach(service => {
+                    const serviceElement = document.createElement('div');
+                    serviceElement.className = 'mb-2 p-2 border rounded';
+                    serviceElement.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><strong>${service.name}</strong></span>
+                            <span class="badge bg-secondary">${service.type}</span>
+                        </div>
+                        <small class="text-muted">${service.namespace} • ${service.cluster_ip || 'No IP'}</small>
+                    `;
+                    servicesList.appendChild(serviceElement);
+                });
+            } catch (error) {
+                console.error('Error loading services:', error);
+            }
+        }
+
+        function updateProgressBar(progressId, textId, percentage, label) {
+            const progressBar = document.getElementById(progressId);
+            const textElement = document.getElementById(textId);
+            
+            progressBar.style.width = `${percentage}%`;
+            progressBar.setAttribute('aria-valuenow', percentage);
+            
+            // Set color based on usage
+            progressBar.className = 'progress-bar';
+            if (percentage > 80) {
+                progressBar.classList.add('bg-danger');
+            } else if (percentage > 60) {
+                progressBar.classList.add('bg-warning');
+            } else {
+                progressBar.classList.add('bg-success');
+            }
+            
+            textElement.textContent = `${label}: ${percentage.toFixed(1)}%`;
+        }
+
+        function getStatusBadgeClass(status) {
+            switch (status.toLowerCase()) {
+                case 'ready':
+                case 'running':
+                case 'healthy':
+                    return 'bg-success';
+                case 'pending':
+                case 'warning':
+                    return 'bg-warning';
+                case 'failed':
+                case 'unhealthy':
+                case 'notready':
+                    return 'bg-danger';
+                default:
+                    return 'bg-secondary';
+            }
+        }
+
+        function updateLastUpdated() {
+            const now = new Date();
+            document.getElementById('last-updated').textContent = `Last updated: ${now.toLocaleTimeString()}`;
+        }
+
+        function showError(message) {
+            // Simple error display - could be enhanced with toast notifications
+            console.error(message);
+        }
+    </script>
+</body>
+</html>

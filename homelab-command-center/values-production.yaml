@@ -1,0 +1,139 @@
+# Production values for homelab-command-center
+
+replicaCount: 2
+
+image:
+  repository: ghcr.io/cooksey14/homelab-command-center
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+# Image pull secrets for private registry
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    traefik.ingress.kubernetes.io/router.middlewares: "homelab-command-center-redirect-https@kubernetescrd"
+  hosts:
+    - host: homelab.cooklabs.net
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: homelab-command-center-tls
+      hosts:
+        - homelab.cooklabs.net
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "15-alpine"
+    pullPolicy: IfNotPresent
+  
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+  
+  auth:
+    database: homelab_db
+    username: homelab
+    password: homelab123  # Change this in production!
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+# Application configuration
+app:
+  config:
+    debug: false
+    checkInterval: 30
+    alertCooldown: 300
+    
+  notifications:
+    email:
+      enabled: false
+      smtpServer: ""
+      smtpPort: 587
+      username: ""
+      password: ""
+      recipient: ""
+    
+    slack:
+      enabled: false
+      token: ""
+      channel: ""
+
+# Redis configuration (optional, for caching)
+redis:
+  enabled: false
+
+# Database migration configuration
+migration:
+  enabled: true
+  version: "latest"  # Change this to trigger new migration runs
+  runAsInitContainer: true  # Set to true to run migrations as init container
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
