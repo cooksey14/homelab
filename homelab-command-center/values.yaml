@@ -74,7 +74,7 @@ postgresql:
   enabled: true
   image:
     repository: postgres
-    tag: "7812056d165a00acfc9a93b36f788cf2adfb06c9"
+    tag: "15-alpine"
     pullPolicy: IfNotPresent
   
   persistence:

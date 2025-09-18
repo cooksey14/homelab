@@ -3,19 +3,15 @@ kind: Application
 metadata:
   name: homelab-command-center
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
     repoURL: https://github.com/cooksey14/homelab.git
-    targetRevision: HEAD
     path: homelab-command-center
+    targetRevision: HEAD
     helm:
       valueFiles:
         - values.yaml
-    repoSecretRef:
-      name: github-repo-secret
   destination:
     server: https://kubernetes.default.svc
     namespace: homelab-command-center
