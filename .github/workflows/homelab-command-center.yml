@@ -4,11 +4,11 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'k3s/homelab-command-center/**'
+      - 'homelab-command-center/**'
   pull_request:
     branches: [ main ]
     paths:
-      - 'k3s/homelab-command-center/**'
+      - 'homelab-command-center/**'
 
 env:
   REGISTRY: ghcr.io
@@ -31,11 +31,11 @@ jobs:
         version: "latest"
     
     - name: Install dependencies
-      working-directory: k3s/homelab-command-center/src
+      working-directory: homelab-command-center/src
       run: uv sync
     
     - name: Run tests
-      working-directory: k3s/homelab-command-center/src
+      working-directory: homelab-command-center/src
       run: uv run python -m pytest tests/ || echo "No tests found, skipping"
 
   build:
@@ -73,7 +73,7 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
-        context: k3s/homelab-command-center
+        context: homelab-command-center
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
@@ -91,7 +91,7 @@ jobs:
     
     - name: Update Helm chart with new image tag
       run: |
-        cd k3s/homelab-command-center
+        cd homelab-command-center
         # Update the image tag in values.yaml to use the latest commit SHA
         sed -i "s/tag: \".*\"/tag: \"${{ github.sha }}\"/" values.yaml
         # Update Chart.yaml version for this release
@@ -104,6 +104,6 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add k3s/homelab-command-center/Chart.yaml k3s/homelab-command-center/values.yaml
+        git add homelab-command-center/Chart.yaml homelab-command-center/values.yaml
         git commit -m "chore: update image tag to ${{ github.sha }} and bump chart version" || exit 0
         git push
