@@ -8,7 +8,8 @@ image:
   tag: "2af1a4100f2fce3c8738de824fb72b0cfbb3569b"
 
 # Image pull secrets for private registry
-imagePullSecrets: []
+imagePullSecrets:
+  - name: ghcr-secret
 
 nameOverride: ""
 fullnameOverride: ""
