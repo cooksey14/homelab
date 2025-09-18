@@ -5,10 +5,12 @@ on:
     branches: [ main ]
     paths:
       - 'homelab-command-center/**'
+      - '.github/workflows/homelab-command-center.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'homelab-command-center/**'
+      - '.github/workflows/homelab-command-center.yml'
 
 env:
   REGISTRY: ghcr.io
