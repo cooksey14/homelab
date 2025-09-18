@@ -9,6 +9,8 @@ spec:
     repoURL: https://github.com/cooksey14/homelab.git
     path: mealie
     targetRevision: HEAD
+    repoSecretRef:
+      name: github-repo-secret
     helm:
       values: |
         replicaCount: 2

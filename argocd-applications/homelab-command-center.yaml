@@ -20,9 +20,6 @@ spec:
     server: https://kubernetes.default.svc
     namespace: homelab-command-center
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
     syncOptions:
       - CreateNamespace=true
       - PrunePropagationPolicy=foreground
