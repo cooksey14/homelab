@@ -5,7 +5,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/cooksey14/homelab-command-center
   pullPolicy: IfNotPresent
-  tag: "2af1a4100f2fce3c8738de824fb72b0cfbb3569b"
+  tag: "7812056d165a00acfc9a93b36f788cf2adfb06c9"
 
 # Image pull secrets for private registry
 imagePullSecrets:
@@ -74,7 +74,7 @@ postgresql:
   enabled: true
   image:
     repository: postgres
-    tag: "2af1a4100f2fce3c8738de824fb72b0cfbb3569b"
+    tag: "7812056d165a00acfc9a93b36f788cf2adfb06c9"
     pullPolicy: IfNotPresent
   
   persistence:
