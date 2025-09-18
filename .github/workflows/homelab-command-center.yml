@@ -107,8 +107,8 @@ jobs:
     - name: Update Helm chart with new image tag
       run: |
         cd homelab-command-center
-        # Update the image tag in values.yaml to use the latest commit SHA
-        sed -i "s/tag: \".*\"/tag: \"${{ github.sha }}\"/" values.yaml
+        # Update only the main application image tag (not PostgreSQL)
+        sed -i "/^image:$/,/^imagePullSecrets:/ s/tag: \".*\"/tag: \"${{ github.sha }}\"/" values.yaml
         # Update Chart.yaml version for this release
         CURRENT_VERSION=$(grep '^version:' Chart.yaml | cut -d' ' -f2)
         NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
