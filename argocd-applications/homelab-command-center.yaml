@@ -9,6 +9,8 @@ spec:
     repoURL: https://github.com/cooksey14/homelab.git
     path: homelab-command-center
     targetRevision: HEAD
+    repoSecretRef:
+      name: github-repo-secret
     helm:
       valueFiles:
         - values.yaml
