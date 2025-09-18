@@ -82,6 +82,17 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
+    - name: Make package public
+      run: |
+        # Get the package name
+        PACKAGE_NAME="homelab-command-center"
+        # Make the package public using GitHub CLI
+        gh api --method PATCH \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          /user/packages/container/$PACKAGE_NAME \
+          -f visibility=public || echo "Failed to make package public, continuing..."
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
