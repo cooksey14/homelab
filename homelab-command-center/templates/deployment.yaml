@@ -28,22 +28,8 @@ spec:
       serviceAccountName: {{ include "homelab-command-center.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      {{- if .Values.migration.runAsInitContainer }}
-      initContainers:
-      - name: migration
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ["python", "migrate.py", "migrate"]
-        envFrom:
-        - secretRef:
-            name: {{ include "homelab-command-center.fullname" . }}-db
-        env:
-        - name: LOG_LEVEL
-          value: "INFO"
-        resources:
-          {{- toYaml .Values.migration.resources | nindent 10 }}
-        securityContext:
-          {{- toYaml .Values.securityContext | nindent 10 }}
+      {{- if false }}
+      # Migration init container disabled for now - can be re-enabled later
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
