@@ -67,9 +67,7 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=sha,prefix={{branch}}-
+          type=sha,format=short
           type=raw,value=latest,enable={{is_default_branch}}
     
     - name: Build and push Docker image
@@ -82,10 +80,18 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
+    - name: Debug tags
+      run: |
+        echo "Generated tags:"
+        echo "${{ steps.meta.outputs.tags }}"
+        echo "Commit SHA (full): ${{ github.sha }}"
+        echo "Commit SHA (short): ${GITHUB_SHA:0:7}"
+        echo "Expected tag: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${GITHUB_SHA:0:7}"
+
     - name: Verify image was pushed
       run: |
-        echo "Verifying image was pushed with commit SHA: ${{ github.sha }}"
-        docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} || echo "Image not found with commit SHA tag"
+        echo "Verifying image was pushed with short commit SHA: ${GITHUB_SHA:0:7}"
+        docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${GITHUB_SHA:0:7} || echo "Image not found with short commit SHA tag"
 
   deploy:
     needs: build
@@ -101,18 +107,19 @@ jobs:
     - name: Update Helm chart with new image tag
       run: |
         cd homelab-command-center
+        SHORT_SHA=${GITHUB_SHA:0:7}
         # Update only the main application image tag (not PostgreSQL)
-        sed -i "/^image:$/,/^imagePullSecrets:/ s/tag: \".*\"/tag: \"${{ github.sha }}\"/" values.yaml
+        sed -i "/^image:$/,/^imagePullSecrets:/ s/tag: \".*\"/tag: \"$SHORT_SHA\"/" values.yaml
         # Update Chart.yaml version for this release
         CURRENT_VERSION=$(grep '^version:' Chart.yaml | cut -d' ' -f2)
         NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
         sed -i "s/^version: .*/version: $NEW_VERSION/" Chart.yaml
-        echo "Updated image tag to ${{ github.sha }} and chart version to $NEW_VERSION"
+        echo "Updated image tag to $SHORT_SHA and chart version to $NEW_VERSION"
     
     - name: Commit and push changes
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add homelab-command-center/Chart.yaml homelab-command-center/values.yaml
-        git commit -m "chore: update image tag to ${{ github.sha }} and bump chart version" || exit 0
+        git commit -m "chore: update image tag to ${GITHUB_SHA:0:7} and bump chart version" || exit 0
         git push
