@@ -20,7 +20,7 @@ class KubernetesClient:
         """Initialize Kubernetes API clients."""
         try:
             # Try to load in-cluster config first (when running in Kubernetes)
-            config.load_in_cluster_config()
+            config.load_incluster_config()
             logger.info("Loaded in-cluster Kubernetes config")
         except Exception:
             try:
