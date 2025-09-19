@@ -19,7 +19,6 @@ spec:
     namespace: homelab-command-center
   syncPolicy:
     syncOptions:
-      - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
     retry:

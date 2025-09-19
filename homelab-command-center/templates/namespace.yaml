@@ -1,3 +1,7 @@
+{{- if false }}
+# Namespace is managed by the 'namespaces' ArgoCD application
+# Disabled to avoid conflicts
+{{- end }}
 apiVersion: v1
 kind: Namespace
 metadata:
