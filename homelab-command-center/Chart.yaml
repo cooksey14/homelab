@@ -2,7 +2,7 @@ apiVersion: v2
 name: homelab-command-center
 description: Modern HomeLab monitoring and management platform
 type: application
-version: 0.2.11
+version: 0.2.12
 appVersion: "1.0.0"
 keywords:
   - homelab
