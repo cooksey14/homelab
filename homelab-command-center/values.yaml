@@ -40,9 +40,13 @@ ingress:
   className: "traefik"
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
-    traefik.ingress.kubernetes.io/router.middlewares: "homelab-command-center-redirect-https@kubernetescrd"
+    traefik.ingress.kubernetes.io/router.middlewares: "homelab-command-center-redirect-https"
   hosts:
     - host: homelab.cooklabs.net
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: homelabs.cooklabs.net
       paths:
         - path: /
           pathType: Prefix
@@ -50,6 +54,7 @@ ingress:
     - secretName: homelab-command-center-tls
       hosts:
         - homelab.cooklabs.net
+        - homelabs.cooklabs.net
 
 resources:
   limits:
