@@ -22,7 +22,3 @@ spec:
   nodeSelectors:
   - matchLabels:
       kubernetes.io/hostname: pi
-  - matchLabels:
-      kubernetes.io/hostname: worker-node-2
-  advertisementInterval: 1s
-  gracefulShutdown: true
