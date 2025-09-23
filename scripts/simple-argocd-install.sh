@@ -43,3 +43,5 @@ echo "Now you can access ArgoCD at the LoadBalancer IP above"
 echo "Default username: admin"
 echo "Get password with: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d"
 
+
+

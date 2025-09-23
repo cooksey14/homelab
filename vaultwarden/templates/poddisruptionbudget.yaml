@@ -17,3 +17,5 @@ spec:
       {{- include "vaultwarden.selectorLabels" . | nindent 6 }}
 {{- end }}
 
+
+

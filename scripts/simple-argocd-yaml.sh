@@ -129,3 +129,5 @@ echo "ArgoCD should be accessible at the LoadBalancer IP above"
 echo "Default username: admin"
 echo "Password will be generated automatically"
 
+
+

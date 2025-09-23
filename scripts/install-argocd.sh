@@ -48,3 +48,5 @@ kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=argocd-applicat
 echo "ArgoCD is ready!"
 kubectl get pods -n argocd
 
+
+

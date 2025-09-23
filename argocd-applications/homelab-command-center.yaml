@@ -18,7 +18,11 @@ spec:
     server: https://kubernetes.default.svc
     namespace: homelab-command-center
   syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
     syncOptions:
+      - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
     retry:
@@ -27,3 +31,4 @@ spec:
         duration: 5s
         factor: 2
         maxDuration: 3m
+  revisionHistoryLimit: 10

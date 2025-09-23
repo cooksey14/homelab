@@ -15,7 +15,6 @@ spec:
   storageClassName: {{ .Values.persistence.storageClass }}
   {{- end }}
 {{- end }}
-{{- end }}
 
 {{- if .Values.persistence.sharedStorage.enabled }}
 ---

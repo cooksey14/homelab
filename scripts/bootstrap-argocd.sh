@@ -53,3 +53,5 @@ echo "Bootstrap complete! ArgoCD should now be managing itself."
 echo "You can now delete the bootstrap installation:"
 echo "helm uninstall argocd-bootstrap -n argocd"
 
+
+
