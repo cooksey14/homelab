@@ -17,6 +17,21 @@ spec:
           podAnnotations:
             prometheus.io/port: "8082"
             prometheus.io/scrape: "true"
+          podTemplate:
+            spec:
+              dnsPolicy: ClusterFirst
+              dnsConfig:
+                options:
+                - name: ndots
+                  value: "2"
+                - name: single-request
+                  value: ""
+                - name: single-request-reopen
+                  value: ""
+                - name: timeout
+                  value: "5"
+                - name: attempts
+                  value: "3"
         global:
           systemDefaultRegistry: ""
         image:
@@ -27,6 +42,13 @@ spec:
           kubernetesIngress:
             publishedService:
               enabled: true
+        serversTransport:
+          forwardingTimeouts:
+            dialTimeout: 30s
+            responseHeaderTimeout: 60s
+            idleConnTimeout: 90s
+            readIdleTimeout: 30s
+            pingTimeout: 15s
         certificatesResolvers:
           letsencrypt:
             acme:
