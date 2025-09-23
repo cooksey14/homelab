@@ -42,7 +42,6 @@ argocd:
       
       # Server configuration
       server.rbac.log.enforce.enable: "true"
-      server.rbac.log.enforce.enable: "true"
       
       # OIDC configuration (if needed)
       # oidc.config: |

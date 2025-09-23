@@ -59,6 +59,42 @@ spec:
             requests:
               cpu: 100m
               memory: 100Mi
+        
+        # Additional configuration files
+        configInline:
+          # IP Address Pool
+          - apiVersion: metallb.io/v1beta1
+            kind: IPAddressPool
+            metadata:
+              name: default
+              namespace: metallb-system
+            spec:
+              addresses:
+              - 192.168.86.100-192.168.86.110
+              autoAssign: true
+              avoidBuggyIPs: true
+              serviceAllocation:
+                priority: 100
+                serviceSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: traefik
+          
+          # L2 Advertisement
+          - apiVersion: metallb.io/v1beta1
+            kind: L2Advertisement
+            metadata:
+              name: default
+              namespace: metallb-system
+            spec:
+              ipAddressPools:
+              - default
+              interfaces:
+              - wlan0
+              nodeSelectors:
+              - matchLabels:
+                  kubernetes.io/hostname: pi
+              - matchLabels:
+                  kubernetes.io/hostname: worker-node-1
   destination:
     server: https://kubernetes.default.svc
     namespace: metallb-system

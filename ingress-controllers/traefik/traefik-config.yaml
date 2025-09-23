@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik-config
+  namespace: kube-system
+data:
+  traefik.yaml: |
+    # Global configuration
+    global:
+      checkNewVersion: false
+      sendAnonymousUsage: false
+    
+    # API configuration
+    api:
+      dashboard: true
+      debug: true
+      insecure: false
+    
+    # Entry points
+    entryPoints:
+      web:
+        address: ":8000"
+        http:
+          redirections:
+            entrypoint:
+              to: websecure
+              scheme: https
+      websecure:
+        address: ":8443"
+    
+    # Providers
+    providers:
+      kubernetes:
+        ingressClass: traefik
+        labelSelector: ""
+        allowCrossNamespace: false
+        allowExternalNameServices: false
+        allowEmptyServices: false
+        ingressEndpoint:
+          hostname: ""
+          ip: ""
+          publishedService: ""
+    
+    # Logging
+    log:
+      level: INFO
+      filePath: ""
+    
+    # Access logs
+    accessLog:
+      format: json
+      fields:
+        defaultMode: keep
+        names:
+          ClientUsername: drop
+        headers:
+          defaultMode: keep
+          names:
+            User-Agent: keep
+            Authorization: drop
+            Content-Type: keep
+    
+    # Metrics
+    metrics:
+      prometheus:
+        addEntryPointsLabels: true
+        addServicesLabels: true
+        addRoutersLabels: true
+    
+    # Health check
+    ping:
+      entryPoint: "traefik"
+    
+    # Health check endpoint
+    entryPoints:
+      traefik:
+        address: ":8080"
+

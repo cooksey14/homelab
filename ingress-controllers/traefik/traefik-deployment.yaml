@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: traefik
+    app.kubernetes.io/instance: traefik-kube-system
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: traefik
+      app.kubernetes.io/instance: traefik-kube-system
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: traefik
+        app.kubernetes.io/instance: traefik-kube-system
+    spec:
+      serviceAccountName: traefik
+      dnsPolicy: ClusterFirst
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "2"
+        - name: edns0
+        - name: single-request
+        - name: single-request-reopen
+        - name: timeout
+          value: "3"
+        - name: attempts
+          value: "2"
+      containers:
+      - name: traefik
+        image: traefik:v3.3.6
+        args:
+        - --configfile=/config/traefik.yaml
+        - --api.dashboard=true
+        - --api.insecure=false
+        - --providers.kubernetesingress=true
+        - --providers.kubernetesingress.allowcrossnamespace=false
+        - --providers.kubernetesingress.allowexternalnameservices=false
+        - --providers.kubernetesingress.allowemptyservices=false
+        - --entrypoints.web.address=:8000
+        - --entrypoints.websecure.address=:8443
+        - --entrypoints.traefik.address=:8080
+        - --ping=true
+        - --ping.entrypoint=traefik
+        - --metrics.prometheus=true
+        - --metrics.prometheus.addentrypointslabels=true
+        - --metrics.prometheus.addserviceslabels=true
+        - --metrics.prometheus.addrouterslabels=true
+        - --log.level=INFO
+        - --accesslog=true
+        - --accesslog.format=json
+        - --global.checknewversion=false
+        - --global.sendanonymoususage=false
+        - --serversTransport.forwardingTimeouts.dialTimeout=10s
+        - --serversTransport.forwardingTimeouts.responseHeaderTimeout=30s
+        - --serversTransport.forwardingTimeouts.idleConnTimeout=90s
+        - --serversTransport.forwardingTimeouts.readIdleTimeout=30s
+        - --serversTransport.forwardingTimeouts.pingTimeout=15s
+        ports:
+        - name: web
+          containerPort: 8000
+          protocol: TCP
+        - name: websecure
+          containerPort: 8443
+          protocol: TCP
+        - name: traefik
+          containerPort: 8080
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: traefik
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: traefik
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: traefik-config
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      priorityClassName: system-cluster-critical
+
