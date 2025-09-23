@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: traefik-ingress
+  name: metallb-config
   namespace: argocd
   finalizers:
   - resources-finalizer.argocd.argoproj.io
@@ -10,17 +10,16 @@ spec:
   source:
     repoURL: https://github.com/cooksey14/homelab.git
     targetRevision: HEAD
-    path: ingress-controllers/traefik
-    directory:
-      include: "*.yaml"
+    path: k3s/metalLB
   destination:
     server: https://kubernetes.default.svc
-    namespace: kube-system
+    namespace: metallb-system
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
+    - CreateNamespace=true
     - PrunePropagationPolicy=foreground
     - PruneLast=true
     retry:
@@ -30,4 +29,3 @@ spec:
         factor: 2
         maxDuration: 3m
   revisionHistoryLimit: 10
-

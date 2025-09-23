@@ -10,9 +10,9 @@ spec:
   source:
     repoURL: https://github.com/cooksey14/homelab.git
     targetRevision: HEAD
-    path: k3s/ingress-controllers
+    path: ingress-controllers
     directory:
-      include: coredns-config.yaml
+      include: "coredns-config.yaml"
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
@@ -21,7 +21,6 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-    - CreateNamespace=true
     - PrunePropagationPolicy=foreground
     - PruneLast=true
     retry:
