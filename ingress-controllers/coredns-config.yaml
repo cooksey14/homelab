@@ -33,9 +33,7 @@ data:
         loop
         reload
         loadbalance
-        import /etc/coredns/custom/*.override
     }
-    import /etc/coredns/custom/*.server
   NodeHosts: |
     192.168.86.27 pi
     192.168.86.31 worker-node-1
