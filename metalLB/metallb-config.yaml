@@ -17,6 +17,8 @@ metadata:
 spec:
   ipAddressPools:
   - default
+  interfaces:
+  - wlan0
   nodeSelectors:
   - matchLabels:
       kubernetes.io/hostname: pi
