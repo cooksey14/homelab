@@ -45,3 +45,4 @@ echo "Get password with: kubectl -n argocd get secret argocd-initial-admin-secre
 
 
 
+
