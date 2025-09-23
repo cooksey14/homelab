@@ -32,7 +32,7 @@ data:
     
     # Providers
     providers:
-      kubernetes:
+      kubernetesIngress:
         ingressClass: traefik
         labelSelector: ""
         allowCrossNamespace: false

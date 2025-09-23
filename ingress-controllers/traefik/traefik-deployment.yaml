@@ -40,13 +40,9 @@ spec:
       - name: traefik
         image: traefik:v3.3.6
         args:
-        - --configfile=/config/traefik.yaml
         - --api.dashboard=true
         - --api.insecure=false
         - --providers.kubernetesingress=true
-        - --providers.kubernetesingress.allowcrossnamespace=false
-        - --providers.kubernetesingress.allowexternalnameservices=false
-        - --providers.kubernetesingress.allowemptyservices=false
         - --entrypoints.web.address=:8000
         - --entrypoints.websecure.address=:8443
         - --entrypoints.traefik.address=:8080
@@ -61,11 +57,10 @@ spec:
         - --accesslog.format=json
         - --global.checknewversion=false
         - --global.sendanonymoususage=false
-        - --serversTransport.forwardingTimeouts.dialTimeout=10s
-        - --serversTransport.forwardingTimeouts.responseHeaderTimeout=30s
-        - --serversTransport.forwardingTimeouts.idleConnTimeout=90s
-        - --serversTransport.forwardingTimeouts.readIdleTimeout=30s
-        - --serversTransport.forwardingTimeouts.pingTimeout=15s
+        - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+        - --certificatesresolvers.letsencrypt.acme.email=admin@cooklabs.net
+        - --certificatesresolvers.letsencrypt.acme.storage=/data/acme.json
+        - --certificatesresolvers.letsencrypt.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
         ports:
         - name: web
           containerPort: 8000
@@ -100,13 +95,11 @@ spec:
             cpu: 500m
             memory: 512Mi
         volumeMounts:
-        - name: config
-          mountPath: /config
-          readOnly: true
+        - name: data
+          mountPath: /data
       volumes:
-      - name: config
-        configMap:
-          name: traefik-config
+      - name: data
+        emptyDir: {}
       nodeSelector:
         kubernetes.io/os: linux
       tolerations:
