@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/cooksey14/homelab.git
     targetRevision: HEAD
-    path: k3s/metalLB
+    path: metalLB
   destination:
     server: https://kubernetes.default.svc
     namespace: metallb-system
@@ -19,7 +19,6 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-    - CreateNamespace=true
     - PrunePropagationPolicy=foreground
     - PruneLast=true
     retry:
