@@ -27,6 +27,8 @@ data:
               scheme: https
       websecure:
         address: ":8443"
+      traefik:
+        address: ":8080"
     
     # Providers
     providers:
@@ -71,8 +73,4 @@ data:
     ping:
       entryPoint: "traefik"
     
-    # Health check endpoint
-    entryPoints:
-      traefik:
-        address: ":8080"
 
