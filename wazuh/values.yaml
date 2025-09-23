@@ -204,7 +204,7 @@ agent:
 # Ingress configuration
 ingress:
   enabled: true
-  className: "traefik-helm"
+  className: "traefik"
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
     traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"

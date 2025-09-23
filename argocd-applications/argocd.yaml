@@ -17,7 +17,7 @@ spec:
             type: ClusterIP
           ingress:
             enabled: true
-            ingressClassName: traefik-helm
+            ingressClassName: traefik
             annotations:
               cert-manager.io/cluster-issuer: letsencrypt-prod-dns
               traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
