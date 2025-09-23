@@ -10,9 +10,7 @@ spec:
   source:
     repoURL: https://github.com/cooksey14/homelab.git
     targetRevision: HEAD
-    path: ingress-controllers
-    directory:
-      include: "coredns-config.yaml"
+    path: coredns
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
