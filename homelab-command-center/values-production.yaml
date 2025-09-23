@@ -37,7 +37,7 @@ service:
 
 ingress:
   enabled: true
-  className: "traefik"
+  className: "traefik-helm"
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     traefik.ingress.kubernetes.io/router.middlewares: "homelab-command-center-redirect-https@kubernetescrd"
