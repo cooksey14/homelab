@@ -5,7 +5,7 @@ metadata:
   namespace: metallb-system
 spec:
   addresses:
-  - 192.168.86.100-192.168.86.110
+  - 192.168.86.240-192.168.86.250
   autoAssign: true
   avoidBuggyIPs: true
 ---
@@ -17,10 +17,3 @@ metadata:
 spec:
   ipAddressPools:
   - default
-  interfaces:
-  - wlan0
-  nodeSelectors:
-  - matchLabels:
-      kubernetes.io/hostname: pi
-  - matchLabels:
-      kubernetes.io/hostname: worker-node-1

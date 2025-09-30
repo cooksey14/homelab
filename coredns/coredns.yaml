@@ -28,6 +28,7 @@ data:
           max_concurrent 1000
           health_check 5s
           policy round_robin
+          except cooklabs.net
         }
         cache 30
         loop
