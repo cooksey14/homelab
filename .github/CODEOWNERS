@@ -1,0 +1,17 @@
+# Global code owners - you are the owner of everything
+* @cooksey14
+
+# Critical infrastructure files
+/k3s/argocd/ @cooksey14
+/k3s/argocd-applications/ @cooksey14
+/k3s/certmanager/ @cooksey14
+/k3s/metalLB/ @cooksey14
+/k3s/namespaces/ @cooksey14
+
+# Security-sensitive files
+*.yaml @cooksey14
+*.yml @cooksey14
+*.sh @cooksey14
+*.py @cooksey14
+*.rs @cooksey14
+*.go @cooksey14
