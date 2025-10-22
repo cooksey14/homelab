@@ -5,8 +5,9 @@ This repository contains the complete GitOps configuration for a K3s cluster run
 ## 🎯 **Cluster Overview**
 
 - **Master Node**: 192.168.86.27 (pimaster)
-- **Worker Node**: 192.168.86.238 (worker-node2)
-- **LoadBalancer IP**: 192.168.86.101 (MetalLB)
+- **Worker Node 1**: 192.168.86.31   (worker-node-1)
+- **Worker Node 2**: 192.168.86.238 (worker-node-2)
+- **LoadBalancer IP**: 192.168.86.200 (MetalLB)
 - **DNS Domain**: cooklabs.net
 - **GitOps**: Fully automated with ArgoCD
 
@@ -56,36 +57,19 @@ All applications use the `cooklabs.net` domain with A records pointing to the Lo
 
 | Domain | IP Address | Purpose |
 |--------|------------|---------|
-| argocd.cooklabs.net | 192.168.86.101 | ArgoCD GitOps UI |
-| mealie.cooklabs.net | 192.168.86.101 | Recipe management |
-| vaultwarden.cooklabs.net | 192.168.86.101 | Password manager |
-| wazuh.cooklabs.net | 192.168.86.101 | Security monitoring |
-| grafana.cooklabs.net | 192.168.86.101 | Monitoring dashboards |
-| prometheus.cooklabs.net | 192.168.86.101 | Metrics collection |
+| argocd.cooklabs.net | 192.168.86.200 | ArgoCD GitOps UI |
+| mealie.cooklabs.net | 192.168.86.200 | Recipe management |
+| vaultwarden.cooklabs.net | 192.168.86.200 | Password manager |
+| wazuh.cooklabs.net | 192.168.86.200 | Security monitoring |
+| grafana.cooklabs.net | 192.168.86.200 | Monitoring dashboards |
+| prometheus.cooklabs.net | 192.168.86.200 | Metrics collection |
 
 ### **LoadBalancer Configuration**
-- **MetalLB IP Pool**: 192.168.86.100-192.168.86.110
-- **Primary LoadBalancer IP**: 192.168.86.101
-- **L2 Advertisement**: On wlan0 interface
-- **Multi-node**: Master + Worker node support
+- **MetalLB IP Pool**: 192.168.86.200-192.168.86.210
+- **Primary LoadBalancer IP**: 192.168.86.200
+- **Multi-node**: Master + Worker nodes support
 
-## 🔐 **Security Features**
 
-### **GitHub Authentication**
-- **Secure PAT Management**: GitHub Personal Access Token stored as Kubernetes secret
-- **Environment Variables**: No hardcoded credentials in repository
-- **Template-based**: Use `argocd/github-repository-secret.yaml.template` and `scripts/deploy-github-secret.sh`
-
-### **TLS Certificates**
-- **Let's Encrypt**: Automatic TLS certificate generation
-- **DNS Challenge**: Uses Cloudflare DNS for validation
-- **Auto-renewal**: Certificates automatically renewed
-
-### **Security Contexts**
-- **Non-root containers**: All applications run as non-root users
-- **Read-only filesystems**: Where appropriate
-- **Resource limits**: CPU and memory limits defined
-- **Network policies**: Ingress controllers with TLS
 
 ## 📊 **Monitoring & Observability**
 

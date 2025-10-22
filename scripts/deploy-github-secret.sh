@@ -53,8 +53,8 @@ print_status "Creating ArgoCD GitHub repository secret..."
 kubectl create secret generic github-repo-secret \
     --namespace=argocd \
     --from-literal=type=git \
-    --from-literal=url=https://github.com/cooksey14/homelab.git \
-    --from-literal=username=cooksey14 \
+    --from-literal=url=https://github.com/${GITHUB_USERNAME}/${GITHUB_REPO}.git \
+    --from-literal=username=${GITHUB_USERNAME} \
     --from-literal=password="$GITHUB_PAT" \
     --dry-run=client -o yaml | \
 kubectl label -f - argocd.argoproj.io/secret-type=repository --local -o yaml | \

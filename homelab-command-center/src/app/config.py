@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     """Application configuration settings."""
     
     # Database settings
-    database_url: str = "postgresql+asyncpg://homelab:homelab@postgres:5432/homelab_command_center"
+    database_url: str = "postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@postgres:5432/homelab_command_center"
     
     # Redis settings
     redis_url: str = "redis://redis:6379/0"
@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     api_version: str = "1.0.0"
     
     # Security
-    secret_key: str = "your-secret-key-change-in-production"
+    secret_key: str = "${SECRET_KEY}"
     
     # Logging
     log_level: str = "INFO"
