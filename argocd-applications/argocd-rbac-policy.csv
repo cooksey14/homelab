@@ -1,0 +1,18 @@
+p, role:argocd-admins, applications, *, */*, allow
+p, role:argocd-admins, clusters, get, *, allow
+p, role:argocd-admins, repositories, get, *, allow
+p, role:argocd-admins, repositories, create, *, allow
+p, role:argocd-admins, repositories, update, *, allow
+p, role:argocd-admins, repositories, delete, *, allow
+p, role:argocd-admins, certificates, get, *, allow
+p, role:argocd-admins, certificates, create, *, allow
+p, role:argocd-admins, certificates, update, *, allow
+p, role:argocd-admins, certificates, delete, *, allow
+p, role:argocd-admins, accounts, get, *, allow
+p, role:argocd-admins, accounts, update, *, allow
+p, role:argocd-admins, gpgkeys, get, *, allow
+p, role:argocd-admins, gpgkeys, create, *, allow
+p, role:argocd-admins, gpgkeys, delete, *, allow
+p, role:argocd-admins, logs, get, *, allow
+p, role:argocd-admins, exec, create, *, allow
+g, argocd-admins, role:argocd-admins
