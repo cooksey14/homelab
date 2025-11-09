@@ -13,7 +13,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-MASTER_IP="${1:-192.168.86.27}"
+MASTER_IP="${1:-10.0.1.10}"
 K3S_TOKEN_FILE="/var/lib/rancher/k3s/server/node-token"
 
 # Function to print colored output

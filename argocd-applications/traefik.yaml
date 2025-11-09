@@ -50,8 +50,8 @@ spec:
             allowExternalNameServices: false
             allowEmptyServices: false
             ingressEndpoint:
-              hostname: 192.168.86.240
-              ip: 192.168.86.240
+              hostname: 10.0.2.1
+              ip: 10.0.2.1
         serversTransport:
           insecureSkipVerify: true
           maxIdleConnsPerHost: 10
@@ -91,7 +91,7 @@ spec:
         service:
           type: LoadBalancer
           ipFamilyPolicy: PreferDualStack
-          loadBalancerIP: 192.168.86.240
+          loadBalancerIP: 10.0.2.1
         tolerations:
         - key: CriticalAddonsOnly
           operator: Exists

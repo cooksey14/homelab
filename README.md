@@ -1,27 +1,16 @@
-# Colin's Kubernetes Cluster Homelab
+# Colin's Kubernetes Homelab Cluster 
 
 This repository contains the complete GitOps configuration for a K3s cluster running on Raspberry Pi nodes, managed entirely through ArgoCD.
 
-## 🎯 **Cluster Overview**
+## **Cluster Overview**
 
-- **Master Node**: 192.168.86.27 (pimaster)
-- **Worker Node 1**: 192.168.86.31   (worker-node-1)
-- **Worker Node 2**: 192.168.86.238 (worker-node-2)
-- **LoadBalancer IP**: 192.168.86.200 (MetalLB)
+- **Master Node**: 10.0.1.10 (k3s-master)
+- **Worker Node 1**: 10.0.1.11 (k3s-worker-1)
+- **Worker Node 2**: 10.0.1.12 (k3s-worker-2)
+- **LoadBalancer IP**: 10.0.2.1 (MetalLB/Traefik)
 - **DNS Domain**: cooklabs.net
 - **GitOps**: Fully automated with ArgoCD
 
-## **Deployed Applications**
-
-| Application | Namespace | URL | Status |
-|-------------|-----------|-----|--------|
-| **ArgoCD** | argocd | https://argocd.cooklabs.net | ✅ Running |
-| **Mealie** | mealie | https://mealie.cooklabs.net | ✅ Running |
-| **Vaultwarden** | vaultwarden | https://vaultwarden.cooklabs.net | ✅ Running |
-| **Wazuh** | security | https://wazuh.cooklabs.net | ✅ Running |
-| **Grafana** | monitoring | https://grafana.cooklabs.net | ✅ Running |
-| **Prometheus** | monitoring | https://prometheus.cooklabs.net | ✅ Running |
-| **PostgreSQL** | monitoring | Internal | ✅ Running |
 
 
 This cluster uses **ArgoCD** for complete GitOps automation:
@@ -31,7 +20,7 @@ This cluster uses **ArgoCD** for complete GitOps automation:
 - **Single point of control** for the entire GitOps workflow
 - **Self-managing** - manages itself and all child applications
 
-## 🛠️ **Infrastructure Components**
+## **Infrastructure Components**
 
 ### **Core Infrastructure**
 - **K3s**: Lightweight Kubernetes distribution
@@ -47,29 +36,33 @@ This cluster uses **ArgoCD** for complete GitOps automation:
 
 ### **Applications**
 - **Mealie**: Recipe management application
-- **Vaultwarden**: Self-hosted password manager
 - **Wazuh**: Security information and event management (SIEM)
 
-## 🌐 **Network Configuration**
+## **Network Configuration**
+
+### **Network Configuration**
+- **Network Range**: 10.0.0.0/16
+- **Gateway**: 10.0.0.1
+- **DHCP Pool**: 10.0.0.46 - 10.0.255.254
+- **Kubernetes Nodes**: 10.0.1.10-10.0.1.12
+- **LoadBalancer Pool**: 10.0.2.1-10.0.2.100
 
 ### **DNS Setup (Cloudflare)**
 All applications use the `cooklabs.net` domain with A records pointing to the LoadBalancer IP:
 
 | Domain | IP Address | Purpose |
 |--------|------------|---------|
-| argocd.cooklabs.net | 192.168.86.200 | ArgoCD GitOps UI |
-| mealie.cooklabs.net | 192.168.86.200 | Recipe management |
-| vaultwarden.cooklabs.net | 192.168.86.200 | Password manager |
-| wazuh.cooklabs.net | 192.168.86.200 | Security monitoring |
-| grafana.cooklabs.net | 192.168.86.200 | Monitoring dashboards |
-| prometheus.cooklabs.net | 192.168.86.200 | Metrics collection |
+| argocd.cooklabs.net | 10.0.2.1 | ArgoCD GitOps UI |
+| mealie.cooklabs.net | 10.0.2.1 | Recipe management |
+| vaultwarden.cooklabs.net | 10.0.2.1 | Password manager |
+| wazuh.cooklabs.net | 10.0.2.1 | Security monitoring |
+| grafana.cooklabs.net | 10.0.2.1 | Monitoring dashboards |
+| prometheus.cooklabs.net | 10.0.2.1 | Metrics collection |
 
 ### **LoadBalancer Configuration**
-- **MetalLB IP Pool**: 192.168.86.200-192.168.86.210
-- **Primary LoadBalancer IP**: 192.168.86.200
+- **MetalLB IP Pool**: 10.0.2.1-10.0.2.100
+- **Primary LoadBalancer IP**: 10.0.2.1 (Traefik)
 - **Multi-node**: Master + Worker nodes support
-
-
 
 ## 📊 **Monitoring & Observability**
 
