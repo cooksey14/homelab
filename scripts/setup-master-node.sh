@@ -14,11 +14,11 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-MASTER_IP="192.168.86.27"
+MASTER_IP="10.0.1.10"
 CLUSTER_CIDR="10.42.0.0/16"
 SERVICE_CIDR="10.43.0.0/16"
 CLUSTER_DNS="10.43.0.10"
-METALLB_POOL="192.168.86.100-192.168.86.110"
+METALLB_POOL="10.0.2.1-10.0.2.100"
 DOMAIN="cooklabs.net"
 
 # Function to print colored output

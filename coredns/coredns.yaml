@@ -36,9 +36,6 @@ data:
         loadbalance
     }
   NodeHosts: |
-    192.168.86.27 pi
-    192.168.86.31 worker-node-1
-    192.168.86.238 worker-node-2
-    2603:80a0:3000:2c3:45d4:2fb2:52e4:24f0 pi
-    2603:80a0:3000:2c3:51a9:ae92:5448:974b worker-node-1
-    2603:80a0:3000:2c3:e549:a726:c9c6:6a2c worker-node-2
+    10.0.1.10 k3s-master
+    10.0.1.11 k3s-worker-1
+    10.0.1.12 k3s-worker-2

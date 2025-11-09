@@ -14,7 +14,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-MASTER_IP="${1:-192.168.86.27}"
+MASTER_IP="${1:-10.0.1.10}"
 WORKER_IP="${2:-$(hostname -I | awk '{print $1}')}"
 K3S_TOKEN_FILE="/var/lib/rancher/k3s/server/node-token"
 K3S_URL="https://${MASTER_IP}:6443"
@@ -231,8 +231,8 @@ show_usage() {
     echo "  WORKER_IP    IP address of this worker node (optional, auto-detected)"
     echo
     echo "Examples:"
-    echo "  $0 192.168.86.27"
-    echo "  $0 192.168.86.27 192.168.86.238"
+    echo "  $0 10.0.1.10"
+    echo "  $0 10.0.1.10 10.0.1.12"
     echo
     echo "Prerequisites:"
     echo "  - Worker node must be able to reach master node on port 6443"

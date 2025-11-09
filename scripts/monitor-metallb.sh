@@ -14,7 +14,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-METALLB_IPS=("192.168.86.102" "192.168.86.107" "192.168.86.108" "192.168.86.109")
+METALLB_IPS=("10.0.2.1" "10.0.2.2" "10.0.2.3" "10.0.2.4")
 CHECK_INTERVAL=30
 MAX_FAILURES=3
 DAEMON_MODE=false
@@ -173,7 +173,7 @@ fix_connectivity_issues() {
     fi
     
     # Restart Traefik if Traefik IP is not reachable
-    if ! check_ip_connectivity "192.168.86.102"; then
+    if ! check_ip_connectivity "10.0.2.1"; then
         print_status "Traefik IP not reachable, restarting Traefik..."
         restart_traefik
         sleep 30

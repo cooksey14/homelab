@@ -197,7 +197,7 @@ main() {
         echo
         print_status "Access URLs:"
         echo "  ArgoCD: https://argocd.cooklabs.net"
-        echo "  Grafana: http://192.168.86.27:30180 (admin/admin)"
+        echo "  Grafana: https://grafana.cooklabs.net"
         echo "  Mealie: https://mealie.cooklabs.net"
         return 0
     else

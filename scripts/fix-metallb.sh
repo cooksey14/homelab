@@ -58,7 +58,7 @@ restart_traefik() {
 check_connectivity() {
     print_status "Checking LoadBalancer connectivity..."
     
-    local ips=("192.168.86.102" "192.168.86.107" "192.168.86.108" "192.168.86.109")
+    local ips=("10.0.2.1" "10.0.2.2" "10.0.2.3" "10.0.2.4")
     local reachable=0
     local total=${#ips[@]}
     
@@ -121,7 +121,7 @@ main() {
     sleep 20
     
     # Restart Traefik if needed
-    if ! ping -c 1 -W 5 "192.168.86.102" >/dev/null 2>&1; then
+    if ! ping -c 1 -W 5 "10.0.2.1" >/dev/null 2>&1; then
         restart_traefik
         sleep 20
     fi
