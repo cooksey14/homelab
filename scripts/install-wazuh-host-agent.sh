@@ -5,7 +5,7 @@
 set -e
 
 # Configuration
-WAZUH_MANAGER_IP="192.168.86.101"  # Your LoadBalancer IP
+WAZUH_MANAGER_IP="10.0.2.7"  # Wazuh LoadBalancer IP
 WAZUH_MANAGER_PORT="1514"
 WAZUH_REGISTRATION_PORT="1515"
 WAZUH_REGISTRATION_PASSWORD="password"  # Change this!
