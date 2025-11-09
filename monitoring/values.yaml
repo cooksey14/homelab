@@ -20,7 +20,7 @@ grafana:
     enabled: true
     className: "traefik"
     annotations:
-      cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
       traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
       traefik.ingress.kubernetes.io/router.tls: "true"
     hosts:
@@ -98,7 +98,7 @@ prometheus:
     enabled: true
     className: "traefik"
     annotations:
-      cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
       traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
       traefik.ingress.kubernetes.io/router.tls: "true"
     hosts:
