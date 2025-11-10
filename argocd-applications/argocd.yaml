@@ -6,8 +6,8 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://argoproj.github.io/argo-helm
     chart: argo-cd
+    repoURL: https://argoproj.github.io/argo-helm
     targetRevision: 5.51.6
     helm:
       values: |
@@ -29,44 +29,6 @@ spec:
                 hosts:
                   - argocd.cooklabs.net
           insecure: true
-        
-        # Configuration
-        configs:
-          params:
-            server.insecure: "true"
-          cm:
-            url: https://argocd.cooklabs.net
-            server.insecure: "true"
-          repositories:
-            homelab:
-              type: git
-              url: https://github.com/cooksey14/homelab.git
-              name: homelab
-        
-        # Resource configuration
-        global:
-          image:
-            repository: quay.io/argoproj/argocd
-            tag: "v3.0.12"
-        
-        # Component configuration
-        dex:
-          enabled: true
-        notifications:
-          enabled: true
-        applicationSet:
-          enabled: true
-        
-        # Redis persistence
-        redis:
-          enabled: true
-          persistence:
-            enabled: true
-            size: 1Gi
-            storageClass: "local-path"
-        
-        # Resource limits
-        server:
           resources:
             limits:
               cpu: 500m
@@ -74,6 +36,43 @@ spec:
             requests:
               cpu: 250m
               memory: 256Mi
+
+        # Configuration - DISABLE creation of ConfigMaps (we manage them via GitOps)
+        configs:
+          params:
+            create: false  # Don't create argocd-cmd-params-cm
+          cm:
+            create: false  # Don't create argocd-cm
+          rbac:
+            create: false  # Don't create argocd-rbac-cm
+          ssh:
+            create: false  # Don't create argocd-ssh-known-hosts-cm
+          tls:
+            create: false  # Don't create argocd-tls-certs-cm
+
+        # Resource configuration
+        global:
+          image:
+            repository: quay.io/argoproj/argocd
+            tag: "v3.0.12"
+
+        # Component configuration
+        dex:
+          enabled: true
+        notifications:
+          enabled: true
+        applicationSet:
+          enabled: true
+
+        # Redis persistence
+        redis:
+          enabled: true
+          persistence:
+            enabled: true
+            size: 1Gi
+            storageClass: "local-path"
+
+        # Controller Resource limits
         controller:
           resources:
             limits:
@@ -90,7 +89,8 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-    - CreateNamespace=true
-    - Prune=true
-    - PrunePropagationPolicy=foreground
-    - PruneLast=true
+      - CreateNamespace=true
+      - Prune=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+
