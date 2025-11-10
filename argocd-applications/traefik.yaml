@@ -13,25 +13,26 @@ spec:
     targetRevision: 35.4.0
     helm:
       values: |
+        # Deploy as DaemonSet for proper k3s integration and HA
         deployment:
+          kind: DaemonSet
+          replicas: 1
           podAnnotations:
             prometheus.io/port: "8082"
             prometheus.io/scrape: "true"
-          podTemplate:
-            spec:
-              dnsPolicy: ClusterFirst
-              dnsConfig:
-                options:
-                - name: ndots
-                  value: "2"
-                - name: single-request
-                  value: ""
-                - name: single-request-reopen
-                  value: ""
-                - name: timeout
-                  value: "5"
-                - name: attempts
-                  value: "3"
+        
+        # DNS configuration
+        dnsPolicy: ClusterFirst
+        dnsConfig:
+          options:
+          - name: ndots
+            value: "2"
+          - name: single-request
+          - name: single-request-reopen
+          - name: timeout
+            value: "5"
+          - name: attempts
+            value: "3"
         additionalArguments:
         - --entrypoints.web.transport.lifeCycle.graceTimeOut=10s
         - --entrypoints.web.transport.respondingTimeouts.idleTimeout=30s
@@ -85,13 +86,12 @@ spec:
               storage: /data/acme.json
               caServer: https://acme-v02.api.letsencrypt.org/directory
         persistence:
-          enabled: true
-          size: 128Mi
-          storageClass: ""
+          enabled: false
         service:
           type: LoadBalancer
           ipFamilyPolicy: PreferDualStack
-          loadBalancerIP: 10.0.2.1
+          loadBalancerIP: 10.0.1.200
+          externalTrafficPolicy: Local
         tolerations:
         - key: CriticalAddonsOnly
           operator: Exists
