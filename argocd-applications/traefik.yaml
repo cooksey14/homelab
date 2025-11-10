@@ -51,8 +51,8 @@ spec:
             allowExternalNameServices: false
             allowEmptyServices: false
             ingressEndpoint:
-              hostname: 10.0.2.1
-              ip: 10.0.2.1
+              hostname: 10.0.0.200
+              ip: 10.0.0.200
         serversTransport:
           insecureSkipVerify: true
           maxIdleConnsPerHost: 10
@@ -90,7 +90,7 @@ spec:
         service:
           type: LoadBalancer
           ipFamilyPolicy: PreferDualStack
-          loadBalancerIP: 10.0.1.200
+          loadBalancerIP: 10.0.0.200
           externalTrafficPolicy: Local
         tolerations:
         - key: CriticalAddonsOnly
