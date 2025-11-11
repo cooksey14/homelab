@@ -1,86 +1,89 @@
 # Colin's Kubernetes Homelab Cluster 
 
-This repository contains the complete GitOps configuration for a K3s cluster running on Raspberry Pi nodes, managed entirely through ArgoCD.
+Complete GitOps configuration for K3s cluster on Raspberry Pi nodes, managed through ArgoCD.
 
-## **Cluster Overview**
+## Cluster Overview
 
 - **Master Node**: 10.0.1.10 (k3s-master)
 - **Worker Node 1**: 10.0.1.11 (k3s-worker-1)
 - **Worker Node 2**: 10.0.1.12 (k3s-worker-2)
-- **LoadBalancer IP**: 10.0.2.1 (MetalLB/Traefik)
+- **Ingress**: Nginx with hostNetwork (ports 80/443 on all nodes)
 - **DNS Domain**: cooklabs.net
 - **GitOps**: Fully automated with ArgoCD
+- **Remote Access**: Tailscale for secure remote kubectl/k9s
 
+### Application of Applications Pattern
+- Root application manages all child applications
+- Single point of control for entire GitOps workflow
+- Self-managing infrastructure
 
+## Infrastructure Components
 
-This cluster uses **ArgoCD** for complete GitOps automation:
-
-### **Application of Applications Pattern**
-- **Root Application** (`root-app`) manages all other applications
-- **Single point of control** for the entire GitOps workflow
-- **Self-managing** - manages itself and all child applications
-
-## **Infrastructure Components**
-
-### **Core Infrastructure**
+### Core Infrastructure
 - **K3s**: Lightweight Kubernetes distribution
-- **MetalLB**: LoadBalancer service for bare metal
-- **Traefik**: Ingress controller for external access
+- **Nginx Ingress**: Host-network based ingress (no LoadBalancer required)
 - **Cert-Manager**: Automatic TLS certificate management
+- **Tailscale**: Secure remote access to cluster
 
-### **GitOps & Monitoring**
+### GitOps & Monitoring
 - **ArgoCD**: GitOps continuous delivery
 - **Grafana**: Metrics visualization and dashboards
 - **Prometheus**: Metrics collection and alerting
 - **PostgreSQL**: Database for monitoring data
 
-### **Applications**
-- **Mealie**: Recipe management application
-- **Wazuh**: Security information and event management (SIEM)
+### Applications
+- **Mealie**: Recipe management
+- **Vaultwarden**: Password manager
+- **Wazuh**: Security monitoring (SIEM)
+- **Homelab Command Center**: Cluster dashboard
 
-## **Network Configuration**
+## Network Configuration
 
-### **Network Configuration**
-- **Network Range**: 10.0.0.0/16
+### Network Layout
+- **Node Subnet**: 10.0.1.0/24 (Nodes at 10.0.1.10-12)
+- **Client Subnet**: 10.0.0.0/24 (DHCP: 10.0.0.46-199)
 - **Gateway**: 10.0.0.1
-- **DHCP Pool**: 10.0.0.46 - 10.0.255.254
-- **Kubernetes Nodes**: 10.0.1.10-10.0.1.12
-- **LoadBalancer Pool**: 10.0.2.1-10.0.2.100
+- **Ingress**: Direct node access via hostNetwork
 
-### **DNS Setup (Cloudflare)**
-All applications use the `cooklabs.net` domain with A records pointing to the LoadBalancer IP:
+### DNS Setup (Cloudflare)
+All services use A records pointing to node IPs:
 
 | Domain | IP Address | Purpose |
 |--------|------------|---------|
-| argocd.cooklabs.net | 10.0.2.1 | ArgoCD GitOps UI |
-| mealie.cooklabs.net | 10.0.2.1 | Recipe management |
-| vaultwarden.cooklabs.net | 10.0.2.1 | Password manager |
-| wazuh.cooklabs.net | 10.0.2.1 | Security monitoring |
-| grafana.cooklabs.net | 10.0.2.1 | Monitoring dashboards |
-| prometheus.cooklabs.net | 10.0.2.1 | Metrics collection |
+| argocd.cooklabs.net | 10.0.1.10, 10.0.1.11 | ArgoCD GitOps UI |
+| homelab.cooklabs.net | 10.0.1.10, 10.0.1.11 | Homelab dashboard |
+| mealie.cooklabs.net | 10.0.1.10, 10.0.1.11 | Recipe management |
+| vaultwarden.cooklabs.net | 10.0.1.10, 10.0.1.11 | Password manager |
+| wazuh.cooklabs.net | 10.0.1.10, 10.0.1.11 | Security monitoring |
+| grafana.cooklabs.net | 10.0.1.10, 10.0.1.11 | Monitoring dashboards |
+| prometheus.cooklabs.net | 10.0.1.10, 10.0.1.11 | Metrics collection |
 
-### **LoadBalancer Configuration**
-- **MetalLB IP Pool**: 10.0.2.1-10.0.2.100
-- **Primary LoadBalancer IP**: 10.0.2.1 (Traefik)
-- **Multi-node**: Master + Worker nodes support
+Note: Multiple A records provide basic high availability
 
-## 📊 **Monitoring & Observability**
+## Remote Access
 
-### **ArgoCD Monitoring**
-- **UI**: https://argocd.cooklabs.net
-- **Auto-sync**: All applications sync automatically
-- **Health checks**: Continuous health monitoring
-- **Sync history**: Complete audit trail of changes
+### Tailscale Setup
+- API server exposed via Tailscale (`k3s-api`)
+- Remote kubectl/k9s access from anywhere
+- OAuth-based authentication
 
-### **Application Monitoring**
-- **Grafana**: https://grafana.cooklabs.net
-- **Prometheus**: https://prometheus.cooklabs.net
-- **Metrics**: CPU, memory, network, and custom metrics
-- **Alerting**: Configurable alerts and notifications
+### Configure Remote Access
+See `/remote-access/README.md` for complete setup instructions.
 
+## Monitoring
 
-### **Emergency Manual Sync**
+### ArgoCD
+- UI: https://argocd.cooklabs.net
+- Auto-sync enabled for all applications
+- Continuous health monitoring
+
+### Metrics & Dashboards
+- Grafana: https://grafana.cooklabs.net
+- Prometheus: https://prometheus.cooklabs.net
+
+## Emergency Procedures
+
+### Force Application Sync
 ```bash
-# Only use in emergencies when GitOps is broken
-kubectl patch application mealie -n argocd --type merge -p '{"operation":{"sync":{"syncStrategy":{"hook":{"force":true}}}}}'
+kubectl patch application <app-name> -n argocd --type merge -p '{"operation":{"sync":{"syncStrategy":{"hook":{"force":true}}}}}'
 ```

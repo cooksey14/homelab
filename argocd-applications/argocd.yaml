@@ -17,13 +17,16 @@ spec:
             type: ClusterIP
           ingress:
             enabled: true
-            ingressClassName: traefik
+            ingressClassName: nginx
             annotations:
               cert-manager.io/cluster-issuer: letsencrypt-prod
-              traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-              traefik.ingress.kubernetes.io/router.tls: "true"
+              nginx.ingress.kubernetes.io/ssl-redirect: "true"
+              nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
             hosts:
-              - argocd.cooklabs.net
+              - host: argocd.cooklabs.net
+                paths:
+                  - path: /
+                    pathType: Prefix
             tls:
               - secretName: argocd-server-tls
                 hosts:
