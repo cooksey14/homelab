@@ -14,7 +14,7 @@ spec:
     helm:
       values: |
         replicaCount: 2
-        
+
         mealie:
           env:
             SECRET_KEY: "CHANGE_ME_GENERATE_SECRET_KEY"
@@ -27,7 +27,7 @@ spec:
             WEB_CONCURRENCY: "1"
             WORKERS_PER_CORE: "1"
             LOG_LEVEL: "INFO"
-        
+
         # Resource limits
         resources:
           limits:
@@ -36,7 +36,7 @@ spec:
           requests:
             cpu: 100m
             memory: 128Mi
-        
+
         # Persistence settings
         persistence:
           enabled: true
@@ -47,7 +47,7 @@ spec:
             enabled: true
             hostPath: "/opt/mealie-shared"
             reclaimPolicy: "Retain"
-        
+
         # Health checks
         mealie:
           healthCheck:
@@ -64,15 +64,13 @@ spec:
             periodSeconds: 30
             timeoutSeconds: 10
             failureThreshold: 3
-        
+
         # Ingress settings
         ingress:
           enabled: true
-          className: "traefik"
+          className: "nginx"
           annotations:
-            cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
-            traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
-            traefik.ingress.kubernetes.io/router.tls: "true"
+            cert-manager.io/cluster-issuer: "letsencrypt-prod"
           hosts:
             - host: mealie.cooklabs.net
               paths:
@@ -90,6 +88,6 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-    - Prune=true
-    - PrunePropagationPolicy=foreground
-    - PruneLast=true
+      - Prune=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true

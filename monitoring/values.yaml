@@ -5,24 +5,22 @@
 grafana:
   enabled: true
   replicaCount: 1
-  
+
   image:
     repository: grafana/grafana
     tag: "11.3.0"
     pullPolicy: IfNotPresent
-  
+
   service:
     type: NodePort
     port: 3000
     nodePort: 30180
-  
+
   ingress:
     enabled: true
-    className: "traefik"
+    className: "nginx"
     annotations:
       cert-manager.io/cluster-issuer: "letsencrypt-prod"
-      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
-      traefik.ingress.kubernetes.io/router.tls: "true"
     hosts:
       - host: grafana.cooklabs.net
         paths:
@@ -32,7 +30,7 @@ grafana:
       - secretName: grafana-tls
         hosts:
           - grafana.cooklabs.net
-  
+
   resources:
     limits:
       cpu: 200m
@@ -40,46 +38,46 @@ grafana:
     requests:
       cpu: 100m
       memory: 128Mi
-  
+
   persistence:
     enabled: true
     size: 1Gi
     accessMode: ReadWriteOnce
     storageClass: ""
-  
+
   podSecurityContext:
     fsGroup: 472
-  
+
   securityContext:
     capabilities:
       drop:
-      - ALL
+        - ALL
     readOnlyRootFilesystem: false
     runAsNonRoot: true
     runAsUser: 472
-  
+
   nodeSelector: {}
-  
+
   podDisruptionBudget:
     enabled: true
     minAvailable: 1
-  
+
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          labelSelector:
-            matchExpressions:
-            - key: app.kubernetes.io/name
-              operator: In
-              values:
-              - monitoring
-            - key: app.kubernetes.io/component
-              operator: In
-              values:
-              - grafana
-          topologyKey: kubernetes.io/hostname
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - monitoring
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - grafana
+            topologyKey: kubernetes.io/hostname
 
 # Prometheus configuration
 prometheus:
@@ -88,19 +86,17 @@ prometheus:
     repository: prom/prometheus
     tag: "v2.48.0"
     pullPolicy: IfNotPresent
-  
+
   service:
     type: NodePort
     port: 80
     nodePort: 30089
-  
+
   ingress:
     enabled: true
-    className: "traefik"
+    className: "nginx"
     annotations:
       cert-manager.io/cluster-issuer: "letsencrypt-prod"
-      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
-      traefik.ingress.kubernetes.io/router.tls: "true"
     hosts:
       - host: prometheus.cooklabs.net
         paths:
@@ -110,7 +106,7 @@ prometheus:
       - secretName: prometheus-tls
         hosts:
           - prometheus.cooklabs.net
-  
+
   resources:
     limits:
       cpu: 200m
@@ -118,32 +114,32 @@ prometheus:
     requests:
       cpu: 100m
       memory: 128Mi
-  
+
   persistence:
     enabled: true
     size: 2Gi
     accessMode: ReadWriteOnce
-  
+
   podDisruptionBudget:
     enabled: true
     minAvailable: 1
-  
+
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          labelSelector:
-            matchExpressions:
-            - key: app.kubernetes.io/name
-              operator: In
-              values:
-              - monitoring
-            - key: app.kubernetes.io/component
-              operator: In
-              values:
-              - prometheus
-          topologyKey: kubernetes.io/hostname
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - monitoring
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - prometheus
+            topologyKey: kubernetes.io/hostname
 
 # Postgres configuration
 postgres:
@@ -152,11 +148,11 @@ postgres:
     repository: postgres
     tag: "17.2"
     pullPolicy: IfNotPresent
-  
+
   service:
     type: ClusterIP
     port: 5432
-  
+
   resources:
     limits:
       cpu: 200m
@@ -164,12 +160,12 @@ postgres:
     requests:
       cpu: 100m
       memory: 128Mi
-  
+
   persistence:
     enabled: true
     size: 2Gi
     accessMode: ReadWriteOnce
-  
+
   env:
     POSTGRES_DB: "monitoring"
     POSTGRES_USER: "postgres"
@@ -192,7 +188,7 @@ podSecurityContext:
 securityContext:
   capabilities:
     drop:
-    - ALL
+      - ALL
   readOnlyRootFilesystem: false
   runAsNonRoot: true
   runAsUser: 1000

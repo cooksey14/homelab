@@ -26,7 +26,7 @@ podSecurityContext:
 securityContext:
   capabilities:
     drop:
-    - ALL
+      - ALL
   readOnlyRootFilesystem: false
   runAsNonRoot: true
   runAsUser: 1000
@@ -37,10 +37,9 @@ service:
 
 ingress:
   enabled: true
-  className: "traefik"
+  className: "nginx"
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    traefik.ingress.kubernetes.io/router.middlewares: "homelab-command-center-redirect-https@kubernetescrd"
   hosts:
     - host: homelab.cooklabs.net
       paths:
@@ -79,19 +78,19 @@ postgresql:
     repository: postgres
     tag: "15-alpine"
     pullPolicy: IfNotPresent
-  
+
   persistence:
     enabled: true
     size: 10Gi
     storageClass: ""
     accessModes:
       - ReadWriteOnce
-  
+
   auth:
     database: homelab_db
     username: homelab
     password: homelab123  # Change this in production!
-  
+
   resources:
     limits:
       cpu: 500m
@@ -106,7 +105,7 @@ app:
     debug: false
     checkInterval: 30
     alertCooldown: 300
-    
+
   notifications:
     email:
       enabled: false
@@ -115,7 +114,7 @@ app:
       username: ""
       password: ""
       recipient: ""
-    
+
     slack:
       enabled: false
       token: ""
@@ -128,8 +127,8 @@ redis:
 # Database migration configuration
 migration:
   enabled: true
-  version: "latest"  # Change this to trigger new migration runs
-  runAsInitContainer: true  # Set to true to run migrations as init container
+  version: "latest"
+  runAsInitContainer: true
   resources:
     limits:
       cpu: 200m

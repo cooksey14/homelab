@@ -48,82 +48,82 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: k8s-app
-                  operator: In
-                  values:
-                  - kube-dns
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: k8s-app
+                      operator: In
+                      values:
+                        - kube-dns
+                topologyKey: kubernetes.io/hostname
       containers:
-      - name: coredns
-        image: rancher/mirrored-coredns-coredns:1.12.1
-        imagePullPolicy: IfNotPresent
-        resources:
-          limits:
-            memory: 170Mi
-          requests:
-            cpu: 100m
-            memory: 70Mi
-        args: [ "-conf", "/etc/coredns/Corefile" ]
-        volumeMounts:
-        - name: config-volume
-          mountPath: /etc/coredns
-          readOnly: true
-        - name: custom-config-volume
-          mountPath: /etc/coredns/custom
-          readOnly: true
-        ports:
-        - containerPort: 53
-          name: dns
-          protocol: UDP
-        - containerPort: 53
-          name: dns-tcp
-          protocol: TCP
-        - containerPort: 9153
-          name: metrics
-          protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-            scheme: HTTP
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-          periodSeconds: 10
-          successThreshold: 1
-          failureThreshold: 5
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 8181
-            scheme: HTTP
-          initialDelaySeconds: 0
-          timeoutSeconds: 1
-          periodSeconds: 2
-          successThreshold: 1
-          failureThreshold: 3
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            add:
-            - NET_BIND_SERVICE
-            drop:
-            - all
-          readOnlyRootFilesystem: true
+        - name: coredns
+          image: rancher/mirrored-coredns-coredns:1.12.1
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              memory: 170Mi
+            requests:
+              cpu: 100m
+              memory: 70Mi
+          args: ["-conf", "/etc/coredns/Corefile"]
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/coredns
+              readOnly: true
+            - name: custom-config-volume
+              mountPath: /etc/coredns/custom
+              readOnly: true
+          ports:
+            - containerPort: 53
+              name: dns
+              protocol: UDP
+            - containerPort: 53
+              name: dns-tcp
+              protocol: TCP
+            - containerPort: 9153
+              name: metrics
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8181
+              scheme: HTTP
+            initialDelaySeconds: 0
+            timeoutSeconds: 1
+            periodSeconds: 2
+            successThreshold: 1
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+                - NET_BIND_SERVICE
+              drop:
+                - all
+            readOnlyRootFilesystem: true
       dnsPolicy: Default
       volumes:
-      - name: config-volume
-        configMap:
-          name: coredns
-          items:
-          - key: Corefile
-            path: Corefile
-          - key: NodeHosts
-            path: NodeHosts
-      - name: custom-config-volume
-        configMap:
-          name: coredns-custom
-          optional: true
+        - name: config-volume
+          configMap:
+            name: coredns
+            items:
+              - key: Corefile
+                path: Corefile
+              - key: NodeHosts
+                path: NodeHosts
+        - name: custom-config-volume
+          configMap:
+            name: coredns-custom
+            optional: true

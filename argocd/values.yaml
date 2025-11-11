@@ -10,15 +10,13 @@ argocd:
       type: ClusterIP
       port: 80
       targetPort: 8080
-    
+
     # Ingress configuration
     ingress:
       enabled: true
-      className: "traefik"
+      className: "nginx"
       annotations:
         cert-manager.io/cluster-issuer: "letsencrypt-prod"
-        traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
-        traefik.ingress.kubernetes.io/router.tls: "true"
       hosts:
         - host: argocd.cooklabs.net
           paths:
@@ -28,7 +26,7 @@ argocd:
         - secretName: argocd-tls
           hosts:
             - argocd.cooklabs.net
-    
+
     # Additional configuration
     config:
       # Repository configuration
@@ -36,13 +34,13 @@ argocd:
         - type: git
           url: https://github.com/cooksey14/homelab.git
           name: homelab
-      
+
       # Application controller configuration
       application.instanceLabelKey: argocd.argoproj.io/instance
-      
+
       # Server configuration
       server.rbac.log.enforce.enable: "true"
-      
+
       # OIDC configuration (if needed)
       # oidc.config: |
       #   name: OIDC
@@ -67,13 +65,13 @@ global:
     repository: quay.io/argoproj/argocd
     tag: "v2.8.4"
     pullPolicy: IfNotPresent
-  
+
   # Security context
   securityContext:
     runAsNonRoot: true
     runAsUser: 999
     fsGroup: 999
-  
+
   # Service account
   serviceAccount:
     create: true
@@ -111,4 +109,4 @@ notifications:
 
 # ApplicationSet controller
 applicationSet:
-  enabled: true 
+  enabled: true

@@ -10,45 +10,45 @@ ingress-nginx:
       ports:
         http: 80
         https: 443
-    
+
     # Run on all nodes as DaemonSet
     kind: DaemonSet
-    
+
     # Service type - ClusterIP since we're using hostNetwork
     service:
       type: ClusterIP
-    
+
     # DNS Policy for hostNetwork
     dnsPolicy: ClusterFirstWithHostNet
-    
+
     # Don't publish service status (we're using hostNetwork)
     publishService:
       enabled: false
-    
+
     # Report node internal IP addresses in ingress status
     reportNodeInternalIp: true
-    
+
     # Set ingress class as default
     ingressClassResource:
       name: nginx
       enabled: true
       default: true
       controllerValue: "k8s.io/ingress-nginx"
-    
+
     # Tolerations to run on control plane nodes
     tolerations:
-    - key: node-role.kubernetes.io/control-plane
-      operator: Exists
-      effect: NoSchedule
-    - key: node-role.kubernetes.io/master
-      operator: Exists
-      effect: NoSchedule
-    - key: CriticalAddonsOnly
-      operator: Exists
-    
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: CriticalAddonsOnly
+        operator: Exists
+
     # Node selector (empty = run on all nodes)
     nodeSelector: {}
-    
+
     # Resource limits
     resources:
       limits:
@@ -57,7 +57,7 @@ ingress-nginx:
       requests:
         cpu: 250m
         memory: 256Mi
-    
+
     # Metrics for Prometheus
     metrics:
       enabled: true
@@ -67,56 +67,60 @@ ingress-nginx:
           prometheus.io/port: "10254"
       serviceMonitor:
         enabled: false  # Enable if you have Prometheus Operator
-    
+
     # Nginx configuration
     config:
       # Enable real IP forwarding
       use-forwarded-headers: "true"
       compute-full-forwarded-for: "true"
       use-proxy-protocol: "false"
-      
+
       # SSL settings
       ssl-protocols: "TLSv1.2 TLSv1.3"
       ssl-redirect: "true"
       hsts: "true"
       hsts-include-subdomains: "true"
       hsts-max-age: "31536000"
-      
+
       # Performance tuning
       worker-processes: "auto"
       max-worker-connections: "16384"
       worker-shutdown-timeout: "240s"
-      
+
       # Body sizes
       client-body-buffer-size: "16k"
       client-max-body-size: "100m"
-      
+
       # Timeouts
       keep-alive: "75"
       keep-alive-requests: "100"
       upstream-keepalive-connections: "50"
       upstream-keepalive-timeout: "60"
-      
+
       # Logging
       log-format-escape-json: "true"
-      log-format-upstream: '{"time": "$time_iso8601", "remote_addr": "$remote_addr", "x_forwarded_for": "$proxy_add_x_forwarded_for", "request": "$request", "status": $status, "bytes_sent": $bytes_sent, "request_time": $request_time, "upstream_addr": "$upstream_addr", "upstream_response_time": "$upstream_response_time", "upstream_status": "$upstream_status", "host": "$host", "http_referer": "$http_referer", "http_user_agent": "$http_user_agent"}'
-      
+      log-format-upstream: '{"time": "$time_iso8601", "remote_addr": "$remote_addr", "x_forwarded_for":
+        "$proxy_add_x_forwarded_for", "request": "$request", "status": $status, "bytes_sent": $bytes_sent,
+        "request_time": $request_time, "upstream_addr": "$upstream_addr", "upstream_response_time": "$upstream_response_time",
+        "upstream_status": "$upstream_status", "host": "$host", "http_referer": "$http_referer", "http_user_agent":
+        "$http_user_agent"}'
+
       # Enable snippet annotations (use with caution)
       allow-snippet-annotations: "true"
-    
+
     # Admission webhooks
     admissionWebhooks:
       enabled: true
       failurePolicy: Fail
       port: 8443
-      
+
     # Lifecycle
     lifecycle:
       preStop:
         exec:
           command:
             - /wait-shutdown
-  
+
   # Default backend
   # Disabled because ARM64 image has compatibility issues
   # Not critical - Nginx provides its own default 404 page
@@ -137,7 +141,7 @@ ingress-nginx:
       requests:
         cpu: 25m
         memory: 32Mi
-    
+
   # RBAC
   rbac:
     create: true

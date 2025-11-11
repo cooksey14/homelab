@@ -35,7 +35,7 @@ spec:
             # Icon cache settings
             ICON_CACHE_TTL: "2592000"
             ICON_CACHE_NEGTTL: "2592000"
-        
+
         # Resource limits
         resources:
           limits:
@@ -44,7 +44,7 @@ spec:
           requests:
             cpu: 100m
             memory: 128Mi
-        
+
         # Persistence settings
         persistence:
           enabled: true
@@ -55,15 +55,13 @@ spec:
             enabled: true
             hostPath: "/opt/vaultwarden-shared"
             reclaimPolicy: "Retain"
-        
+
         # Ingress settings
         ingress:
           enabled: true
-          className: "traefik"
+          className: "nginx"
           annotations:
-            cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
-            traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
-            traefik.ingress.kubernetes.io/router.tls: "true"
+            cert-manager.io/cluster-issuer: "letsencrypt-prod"
           hosts:
             - host: vaultwarden.cooklabs.net
               paths:
@@ -81,6 +79,6 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-    - Prune=true
-    - PrunePropagationPolicy=foreground
-    - PruneLast=true
+      - Prune=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true

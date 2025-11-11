@@ -15,7 +15,7 @@ helm install argocd argo/argo-cd \
   --set server.service.type=ClusterIP \
   --set server.ingress.enabled=true \
   --set server.ingress.ingressClassName=traefik \
-  --set server.ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt-prod-dns \
+  --set server.ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt-prod \
   --set server.ingress.annotations."traefik\.ingress\.kubernetes\.io/router\.entrypoints"=web,websecure \
   --set server.ingress.annotations."traefik\.ingress\.kubernetes\.io/router\.tls"=true \
   --set server.ingress.hosts[0]=argocd.cooklabs.net \
@@ -47,6 +47,7 @@ kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=argocd-applicat
 
 echo "ArgoCD is ready!"
 kubectl get pods -n argocd
+
 
 
 

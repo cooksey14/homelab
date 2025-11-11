@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/part-of: argocd
     argocd.argoproj.io/secret-type: dex.config
 data:
-  dex.yaml: |
+  dex.yaml: |-
     connectors:
       - type: saml
         id: beyondidentity

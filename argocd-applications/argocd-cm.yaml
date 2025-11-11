@@ -16,7 +16,7 @@ data:
   timeout.reconciliation: "600s"
   timeout.reconciliation.jitter: "60s"
   application.instanceLabelKey: argocd.argoproj.io/instance
-  dex.config: |
+  dex.config: |-
     connectors:
       - type: saml
         id: beyondidentity

@@ -4,7 +4,7 @@ metadata:
   name: coredns
   namespace: argocd
   finalizers:
-  - resources-finalizer.argocd.argoproj.io
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
@@ -19,8 +19,8 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-    - PrunePropagationPolicy=foreground
-    - PruneLast=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
     retry:
       limit: 5
       backoff:

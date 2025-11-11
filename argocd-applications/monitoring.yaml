@@ -16,11 +16,9 @@ spec:
           enabled: true
           ingress:
             enabled: true
-            className: "traefik"
+            className: "nginx"
             annotations:
-              cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
-              traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
-              traefik.ingress.kubernetes.io/router.tls: "true"
+              cert-manager.io/cluster-issuer: "letsencrypt-prod"
             hosts:
               - host: grafana.cooklabs.net
                 paths:
@@ -37,17 +35,15 @@ spec:
             requests:
               cpu: 100m
               memory: 128Mi
-        
+
         # Prometheus configuration
         prometheus:
           enabled: true
           ingress:
             enabled: true
-            className: "traefik"
+            className: "nginx"
             annotations:
-              cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
-              traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
-              traefik.ingress.kubernetes.io/router.tls: "true"
+              cert-manager.io/cluster-issuer: "letsencrypt-prod"
             hosts:
               - host: prometheus.cooklabs.net
                 paths:
@@ -64,7 +60,7 @@ spec:
             requests:
               cpu: 100m
               memory: 128Mi
-        
+
         # Postgres configuration
         postgres:
           enabled: true
@@ -87,6 +83,6 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-    - Prune=true
-    - PrunePropagationPolicy=foreground
-    - PruneLast=true
+      - Prune=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true

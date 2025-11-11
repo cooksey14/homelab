@@ -8,27 +8,27 @@ tailscale-operator:
   oauth:
     clientId: ""
     clientSecret: ""
-  
+
   # Operator configuration
   operatorConfig:
     # Hostname for the operator pod
     hostname: "k3s-operator"
-    
+
     # Explicitly disable tags - they require ACL configuration first
     defaultTags: []
-    
+
     # Log level (info, debug, error)
     logging: "info"
-  
+
   # API Server Proxy - Exposes Kubernetes API via Tailscale
   apiServerProxyConfig:
     mode: "true"
     hostname: "k3s-api"
-  
-  # Ingress Proxy - Disabled until tags are configured in Tailscale ACL
+
+  # Ingress Proxy - Exposes annotated ingresses via Tailscale
   ingressProxyConfig:
-    mode: "false"
-  
+    mode: "true"
+
   # Resources
   resources:
     requests:
@@ -37,22 +37,22 @@ tailscale-operator:
     limits:
       cpu: 500m
       memory: 256Mi
-  
+
   # RBAC
   rbac:
     create: true
-  
+
   # Service Account
   serviceAccount:
     create: true
     name: tailscale-operator
 
 # Optional: Subnet router configuration
-# Uncomment to expose your entire k8s network via Tailscale
-# subnetRouter:
-#   enabled: true
-#   routes:
-#     - "10.0.1.0/24"  # Node network
-#     - "10.43.0.0/16"  # Service network
-#     - "10.42.0.0/16"  # Pod network
+# Exposes your entire k8s network via Tailscale
+subnetRouter:
+  enabled: true
+  routes:
+    - "10.0.1.0/24"  # Node network
+    - "10.43.0.0/16"  # Service network
+    - "10.42.0.0/16"  # Pod network
 
