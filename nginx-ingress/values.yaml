@@ -118,12 +118,18 @@ ingress-nginx:
             - /wait-shutdown
   
   # Default backend
+  # Disabled because ARM64 image has compatibility issues
+  # Not critical - Nginx provides its own default 404 page
   defaultBackend:
-    enabled: true
+    enabled: false
     name: defaultbackend
     image:
-      repository: registry.k8s.io/defaultbackend-amd64
+      # Use multi-arch image for ARM support (Raspberry Pi)
+      repository: registry.k8s.io/defaultbackend-arm64
       tag: "1.5"
+      # Alternative: Use a multi-arch image that works on both ARM and AMD64
+      # repository: gcr.io/google_containers/defaultbackend-arm64
+      # tag: "1.5"
     resources:
       limits:
         cpu: 50m
