@@ -21,7 +21,3 @@ spec:
     - Prune=true
     - PrunePropagationPolicy=foreground
     - PruneLast=true
-
-
-
-

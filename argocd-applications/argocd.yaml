@@ -22,6 +22,10 @@ spec:
               cert-manager.io/cluster-issuer: letsencrypt-prod
               nginx.ingress.kubernetes.io/ssl-redirect: "true"
               nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+              # Tailscale annotations - expose via Tailscale
+              tailscale.com/expose: "true"
+              tailscale.com/hostname: "argocd"
+              tailscale.com/funnel: "false"
             hosts:
               - host: argocd.cooklabs.net
                 paths:

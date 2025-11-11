@@ -15,10 +15,10 @@ spec:
         global:
           leaderElection:
             namespace: cert-manager
-        
+
         # Install CRDs
         installCRDs: true
-        
+
         # Resource configuration
         resources:
           limits:
@@ -27,7 +27,7 @@ spec:
           requests:
             cpu: 50m
             memory: 64Mi
-        
+
         # Webhook configuration
         webhook:
           resources:
@@ -37,7 +37,7 @@ spec:
             requests:
               cpu: 50m
               memory: 64Mi
-        
+
         # CA Injector configuration
         cainjector:
           resources:
@@ -47,27 +47,27 @@ spec:
             requests:
               cpu: 50m
               memory: 64Mi
-        
+
         # Node selector and affinity
         nodeSelector: {}
         affinity: {}
         tolerations: []
-        
+
         # Security context
         securityContext:
           runAsNonRoot: true
           runAsUser: 1000
           fsGroup: 1000
-        
+
         # Service account
         serviceAccount:
           create: true
           name: cert-manager
-        
+
         # Prometheus monitoring
         prometheus:
           enabled: false  # Enable if you want Prometheus metrics
-        
+
         # Startup probe
         startupapicheck:
           enabled: true
@@ -88,7 +88,7 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-    - CreateNamespace=true
-    - Prune=true
-    - PrunePropagationPolicy=foreground
-    - PruneLast=true
+      - CreateNamespace=true
+      - Prune=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true

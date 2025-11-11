@@ -21,18 +21,18 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-    - CreateNamespace=true
-    - Prune=true
-    - PrunePropagationPolicy=foreground
-    - PruneLast=true
+      - CreateNamespace=true
+      - Prune=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
     helm:
       values: |
         # Override default values for production
         namespace: security
-        
+
         # Manager configuration
         manager:
-          replicaCount: 0  # Scaled down - keeping for future use
+          replicaCount: 0
           image:
             repository: kalingth/wazuh-manager
             pullPolicy: IfNotPresent
@@ -49,10 +49,10 @@ spec:
             runAsGroup: 0
             runAsNonRoot: false
             privileged: true
-        
+
         # Indexer configuration
         indexer:
-          replicaCount: 0  # Scaled down - keeping for future use
+          replicaCount: 0
           image:
             repository: kalingth/wazuh-indexer
             pullPolicy: IfNotPresent
@@ -83,7 +83,7 @@ spec:
               value: "-Xms1g -Xmx1g"
             - name: "OPENSEARCH_INITIAL_ADMIN_PASSWORD"
               value: "admin"
-        
+
         # Dashboard configuration
         dashboard:
           replicaCount: 0  # Scaled down - keeping for future use
@@ -120,7 +120,7 @@ spec:
           config:
             username: "admin"
             password: "admin"
-        
+
         # Agent configuration (DaemonSet for each node) - Using community ARM64 image
         agent:
           image:
@@ -136,15 +136,13 @@ spec:
               memory: 128Mi
           securityContext:
             privileged: true
-        
+
         # Ingress settings
         ingress:
           enabled: true
-          className: "traefik"
+          className: "nginx"
           annotations:
-            cert-manager.io/cluster-issuer: "letsencrypt-prod-dns"
-            traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
-            traefik.ingress.kubernetes.io/router.tls: "true"
+            cert-manager.io/cluster-issuer: "letsencrypt-prod"
           hosts:
             - host: wazuh.cooklabs.net
               paths:
@@ -154,16 +152,16 @@ spec:
             - secretName: wazuh-tls
               hosts:
                 - wazuh.cooklabs.net
-        
+
         # Pod disruption budget
         podDisruptionBudget:
           enabled: true
           minAvailable: 1
-        
+
         # Security context
         podSecurityContext:
           fsGroup: 1000
-        
+
         securityContext:
           capabilities:
             drop:
@@ -171,7 +169,7 @@ spec:
           readOnlyRootFilesystem: false
           runAsNonRoot: true
           runAsUser: 1000
-        
+
         # Anti-affinity for high availability
         affinity:
           podAntiAffinity:
@@ -193,7 +191,7 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-    - CreateNamespace=true
-    - Prune=true
-    - PrunePropagationPolicy=foreground
-    - PruneLast=true
+      - CreateNamespace=true
+      - Prune=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true

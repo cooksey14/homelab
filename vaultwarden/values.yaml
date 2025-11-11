@@ -25,7 +25,7 @@ podSecurityContext:
 securityContext:
   capabilities:
     drop:
-    - ALL
+      - ALL
   readOnlyRootFilesystem: false
   runAsNonRoot: true
   runAsUser: 1000
@@ -37,11 +37,9 @@ service:
 
 ingress:
   enabled: true
-  className: "traefik"
+  className: "nginx"
   annotations:
-      cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
-    traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
   hosts:
     - host: vaultwarden.cooklabs.net
       paths:
@@ -73,19 +71,19 @@ tolerations: []
 affinity:
   podAntiAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
-    - labelSelector:
-        matchExpressions:
-        - key: app.kubernetes.io/name
-          operator: In
-          values:
-          - vaultwarden
-      topologyKey: kubernetes.io/hostname
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - vaultwarden
+        topologyKey: kubernetes.io/hostname
   nodeAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
       nodeSelectorTerms:
-      - matchExpressions:
-        - key: node-role.kubernetes.io/worker
-          operator: Exists
+        - matchExpressions:
+            - key: node-role.kubernetes.io/worker
+              operator: Exists
 
 podDisruptionBudget:
   enabled: true
@@ -106,48 +104,48 @@ vaultwarden:
   # Admin panel settings
   adminPanel:
     enabled: true
-  
+
   # Database settings
   database:
     url: "file:/data/db.sqlite3"
-  
+
   # Web vault settings
   webVault:
     enabled: true
-  
+
   # Environment variables
   env:
     # Admin token for admin panel (generate with: openssl rand -base64 48)
     ADMIN_TOKEN: "CHANGE_ME_GENERATE_WITH_OPENSSL_RAND_BASE64_48"
-    
+
     # Domain for the web vault
     DOMAIN: "https://vaultwarden.cooklabs.net"
-    
+
     # Signups allowed (set to false in production)
     SIGNUPS_ALLOWED: "true"
-    
+
     # Invitations allowed
     INVITATIONS_ALLOWED: "true"
-    
+
     # Show password hint
     SHOW_PASSWORD_HINT: "false"
-    
+
     # Password iterations (increase for better security)
     PASSWORD_ITERATIONS: "100000"
-    
+
     # WebSocket support
     WEBSOCKET_ENABLED: "true"
-    
+
     # Log level
     LOG_LEVEL: "warn"
-    
+
     # Extended logging
     EXTENDED_LOGGING: "true"
-    
+
     # Icon service
     ICON_CACHE_TTL: "2592000"
     ICON_CACHE_NEGTTL: "2592000"
-    
+
     # Email settings
     # SMTP_HOST: ""
     # SMTP_FROM: ""
@@ -155,11 +153,11 @@ vaultwarden:
     # SMTP_SECURITY: ""
     # SMTP_USERNAME: ""
     # SMTP_PASSWORD: ""
-    
+
     # YubiKey settings
     # YUBICO_CLIENT_ID: ""
     # YUBICO_SECRET_KEY: ""
-    
+
     # Duo settings
     # DUO_IKEY: ""
     # DUO_SKEY: ""

@@ -25,7 +25,7 @@ podSecurityContext:
 securityContext:
   capabilities:
     drop:
-    - ALL
+      - ALL
   readOnlyRootFilesystem: false
   runAsNonRoot: true
   runAsUser: 1000
@@ -37,11 +37,9 @@ service:
 
 ingress:
   enabled: true
-  className: "traefik"
+  className: "nginx"
   annotations:
-      cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
-    traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
   hosts:
     - host: mealie.cooklabs.net
       paths:
@@ -73,19 +71,19 @@ tolerations: []
 affinity:
   podAntiAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
-    - labelSelector:
-        matchExpressions:
-        - key: app.kubernetes.io/name
-          operator: In
-          values:
-          - mealie
-      topologyKey: kubernetes.io/hostname
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - mealie
+        topologyKey: kubernetes.io/hostname
   nodeAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
       nodeSelectorTerms:
-      - matchExpressions:
-        - key: node-role.kubernetes.io/worker
-          operator: Exists
+        - matchExpressions:
+            - key: node-role.kubernetes.io/worker
+              operator: Exists
 
 podDisruptionBudget:
   enabled: true
@@ -107,28 +105,28 @@ mealie:
   env:
     # Database URL (SQLite for single instance)
     DATABASE_URL: "sqlite:///app/data/mealie.db"
-    
+
     # Default user settings
     DEFAULT_USER: "admin"
     DEFAULT_PASSWORD: "changeme"
-    
+
     # Security settings
     SECRET_KEY: "CHANGE_ME_GENERATE_SECRET_KEY"
-    
+
     # Web settings
     WEB_CONCURRENCY: "1"
     WORKERS_PER_CORE: "1"
-    
+
     # Logging
     LOG_LEVEL: "INFO"
-    
+
     # Features
     ENABLE_SIGNUP: "true"
     ENABLE_OPENAPI: "true"
-    
+
     # Timezone
     TZ: "UTC"
-  
+
   # Health check settings
   healthCheck:
     enabled: true
@@ -137,7 +135,7 @@ mealie:
     periodSeconds: 10
     timeoutSeconds: 5
     failureThreshold: 3
-  
+
   # Liveness probe settings
   livenessProbe:
     enabled: true

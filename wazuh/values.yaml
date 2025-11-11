@@ -27,7 +27,7 @@ podSecurityContext:
 securityContext:
   capabilities:
     drop:
-    - ALL
+      - ALL
   readOnlyRootFilesystem: false
   runAsNonRoot: true
   runAsUser: 1000
@@ -39,15 +39,15 @@ tolerations: []
 affinity:
   podAntiAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
-    - weight: 100
-      podAffinityTerm:
-        labelSelector:
-          matchExpressions:
-          - key: app.kubernetes.io/name
-            operator: In
-            values:
-            - wazuh
-        topologyKey: kubernetes.io/hostname
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - wazuh
+          topologyKey: kubernetes.io/hostname
 
 podDisruptionBudget:
   enabled: true
@@ -169,46 +169,44 @@ agent:
     privileged: true
     capabilities:
       add:
-      - SYS_PTRACE
-      - AUDIT_CONTROL
-      - AUDIT_READ
-      - AUDIT_WRITE
-      - CHOWN
-      - DAC_OVERRIDE
-      - FOWNER
-      - FSETID
-      - KILL
-      - SETGID
-      - SETUID
-      - SYS_ADMIN
-      - SYS_CHROOT
-      - SYS_MODULE
-      - SYS_NICE
-      - SYS_PACCT
-      - SYS_RESOURCE
-      - SYS_TIME
-      - SYS_TTY_CONFIG
-      - MAC_ADMIN
-      - MAC_OVERRIDE
-      - MKNOD
-      - NET_ADMIN
-      - NET_RAW
-      - SYSLOG
-      - WAKE_ALARM
-      - BLOCK_SUSPEND
-      - LEASE
-      - SYS_BOOT
-      - SYS_RAWIO
+        - SYS_PTRACE
+        - AUDIT_CONTROL
+        - AUDIT_READ
+        - AUDIT_WRITE
+        - CHOWN
+        - DAC_OVERRIDE
+        - FOWNER
+        - FSETID
+        - KILL
+        - SETGID
+        - SETUID
+        - SYS_ADMIN
+        - SYS_CHROOT
+        - SYS_MODULE
+        - SYS_NICE
+        - SYS_PACCT
+        - SYS_RESOURCE
+        - SYS_TIME
+        - SYS_TTY_CONFIG
+        - MAC_ADMIN
+        - MAC_OVERRIDE
+        - MKNOD
+        - NET_ADMIN
+        - NET_RAW
+        - SYSLOG
+        - WAKE_ALARM
+        - BLOCK_SUSPEND
+        - LEASE
+        - SYS_BOOT
+        - SYS_RAWIO
   env: []
 
 # Ingress configuration
 ingress:
   enabled: true
-  className: "traefik"
+  className: "nginx"
   annotations:
-      cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
-    traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
   hosts:
     - host: wazuh.cooklabs.net
       paths:

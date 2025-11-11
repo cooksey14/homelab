@@ -2,6 +2,7 @@
 
 # Sensitive files that should never be committed
 argocd/github-repository-secret.yaml
+argocd-applications/github-repo-secret.yaml
 *.secret.yaml
 *.key
 *.pem

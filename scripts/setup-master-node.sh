@@ -158,13 +158,13 @@ install_cert_manager() {
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-prod-dns
+  name: letsencrypt-prod
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
     email: cook.colin13@gmail.com
     privateKeySecretRef:
-      name: letsencrypt-prod-dns
+      name: letsencrypt-prod
     solvers:
     - http01:
         ingress:
@@ -283,7 +283,7 @@ metadata:
   name: prometheus
   namespace: monitoring
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod-dns
+    cert-manager.io/cluster-issuer: letsencrypt-prod
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
@@ -346,7 +346,7 @@ metadata:
   name: grafana
   namespace: monitoring
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod-dns
+    cert-manager.io/cluster-issuer: letsencrypt-prod
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
@@ -385,7 +385,7 @@ server:
     annotations:
       traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
       traefik.ingress.kubernetes.io/router.tls: "true"
-      cert-manager.io/cluster-issuer: letsencrypt-prod-dns
+      cert-manager.io/cluster-issuer: letsencrypt-prod
     tls:
       - hosts:
           - argocd.$DOMAIN
@@ -467,7 +467,7 @@ metadata:
   name: mealie
   namespace: mealie
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod-dns
+    cert-manager.io/cluster-issuer: letsencrypt-prod
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
 spec:

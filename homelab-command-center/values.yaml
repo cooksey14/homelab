@@ -26,7 +26,7 @@ podSecurityContext:
 securityContext:
   capabilities:
     drop:
-    - ALL
+      - ALL
   readOnlyRootFilesystem: false
   runAsNonRoot: true
   runAsUser: 1000
@@ -37,7 +37,7 @@ service:
 
 ingress:
   enabled: true
-  className: "traefik"
+  className: "nginx"
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
   hosts:
@@ -74,19 +74,19 @@ postgresql:
     repository: postgres
     tag: "15-alpine"
     pullPolicy: IfNotPresent
-  
+
   persistence:
     enabled: true
     size: 2Gi
     storageClass: ""
     accessModes:
       - ReadWriteOnce
-  
+
   auth:
     database: homelab_db
     username: homelab
-    password: homelab123  # Change this in production!
-  
+    password: homelab123
+
   resources:
     limits:
       cpu: 200m
@@ -101,7 +101,7 @@ app:
     debug: false
     checkInterval: 30
     alertCooldown: 300
-    
+
   notifications:
     email:
       enabled: false
@@ -110,7 +110,7 @@ app:
       username: ""
       password: ""
       recipient: ""
-    
+
     slack:
       enabled: false
       token: ""
@@ -123,8 +123,8 @@ redis:
 # Database migration configuration
 migration:
   enabled: false
-  version: "latest"  # Change this to trigger new migration runs
-  runAsInitContainer: false  # Set to true to run migrations as init container
+  version: "latest"
+  runAsInitContainer: false
   resources:
     limits:
       cpu: 200m
