@@ -32,7 +32,7 @@ spec:
         
         # Manager configuration
         manager:
-          replicaCount: 1
+          replicaCount: 0  # Scaled down - keeping for future use
           image:
             repository: kalingth/wazuh-manager
             pullPolicy: IfNotPresent
@@ -52,7 +52,7 @@ spec:
         
         # Indexer configuration
         indexer:
-          replicaCount: 1
+          replicaCount: 0  # Scaled down - keeping for future use
           image:
             repository: kalingth/wazuh-indexer
             pullPolicy: IfNotPresent
@@ -86,7 +86,7 @@ spec:
         
         # Dashboard configuration
         dashboard:
-          replicaCount: 1
+          replicaCount: 0  # Scaled down - keeping for future use
           image:
             repository: kalingth/wazuh-dashboard
             pullPolicy: IfNotPresent
