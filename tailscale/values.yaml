@@ -14,25 +14,20 @@ tailscale-operator:
     # Hostname for the operator pod
     hostname: "k3s-operator"
     
-    # Default tags for all Tailscale devices created by operator
-    # Removed tags as they need to be created in Tailscale ACL first
-    # defaultTags:
-    #   - "tag:k8s"
-    #   - "tag:homelab"
+    # Explicitly disable tags - they require ACL configuration first
+    defaultTags: []
     
     # Log level (info, debug, error)
     logging: "info"
   
   # API Server Proxy - Exposes Kubernetes API via Tailscale
-  # Access kubectl from anywhere without VPN!
   apiServerProxyConfig:
     mode: "true"
     hostname: "k3s-api"
   
-  # Ingress Proxy - Exposes ingress resources via Tailscale
-  # Useful for accessing services remotely without exposing to internet
+  # Ingress Proxy - Disabled until tags are configured in Tailscale ACL
   ingressProxyConfig:
-    mode: "true"
+    mode: "false"
   
   # Resources
   resources:
