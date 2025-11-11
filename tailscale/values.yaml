@@ -3,15 +3,11 @@
 
 tailscale-operator:
   # OAuth configuration
-  # REQUIRED: Create OAuth client at https://login.tailscale.com/admin/settings/oauth
-  # Steps:
-  # 1. Go to https://login.tailscale.com/admin/settings/oauth
-  # 2. Click "Generate OAuth Client"
-  # 3. Add tags: tag:k8s, tag:homelab
-  # 4. Copy Client ID and Client Secret below
+  # REQUIRED: OAuth credentials must be provided via values-secrets.yaml (not committed)
+  # or passed at runtime via --set oauth.clientId=xxx
   oauth:
-    clientId: ""  # TODO: Set after creating OAuth client
-    clientSecret: ""  # TODO: Set via secret or directly here
+    clientId: ""
+    clientSecret: ""
   
   # Operator configuration
   operatorConfig:
@@ -19,10 +15,10 @@ tailscale-operator:
     hostname: "k3s-operator"
     
     # Default tags for all Tailscale devices created by operator
-    # Make sure these tags exist in your Tailscale ACL
-    defaultTags:
-      - "tag:k8s"
-      - "tag:homelab"
+    # Removed tags as they need to be created in Tailscale ACL first
+    # defaultTags:
+    #   - "tag:k8s"
+    #   - "tag:homelab"
     
     # Log level (info, debug, error)
     logging: "info"
