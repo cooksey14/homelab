@@ -29,7 +29,7 @@ jobs:
       has-app-changes: ${{ steps.changes.outputs.app }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
@@ -53,7 +53,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Setup Python
       uses: actions/setup-python@v4
@@ -163,7 +163,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Setup kubectl
       uses: azure/setup-kubectl@v3
